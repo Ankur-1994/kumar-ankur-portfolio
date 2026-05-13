@@ -105,6 +105,16 @@ export function CommandPalette() {
           close();
         },
       },
+      {
+        id: "print-page",
+        group: "Actions",
+        label: "Print page (Save as PDF)",
+        keywords: ["print", "pdf", "export", "paper", "hardcopy"],
+        run: () => {
+          close();
+          requestAnimationFrame(() => window.print());
+        },
+      },
     ];
 
     const openCmds: Cmd[] = [
@@ -267,7 +277,7 @@ export function CommandPalette() {
       {open ? (
         <motion.div
           key="command-palette-root"
-          className="fixed inset-0 z-[480]"
+          className="ka-no-print fixed inset-0 z-[480]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

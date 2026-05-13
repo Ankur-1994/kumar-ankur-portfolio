@@ -37,7 +37,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={value}>
       {children}
       <div
-        className="pointer-events-none fixed bottom-6 left-1/2 z-[490] w-[min(100%-2rem,420px)] -translate-x-1/2 px-4"
+        className="ka-no-print pointer-events-none fixed bottom-6 left-1/2 z-[490] w-[min(100%-2rem,420px)] -translate-x-1/2 px-4"
         role="status"
         aria-live="polite"
         aria-atomic="true"

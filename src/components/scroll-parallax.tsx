@@ -48,7 +48,7 @@ export function ScrollParallax() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-0 min-h-[100dvh] overflow-x-clip"
+      className="ka-no-print pointer-events-none fixed inset-0 z-0 min-h-[100dvh] overflow-x-clip"
       aria-hidden
     >
       <div

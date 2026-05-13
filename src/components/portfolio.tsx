@@ -77,6 +77,17 @@ function IconDownload(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+function IconPrint(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        fill="currentColor"
+        d="M19 8h-1V3H6v5H5a3 3 0 0 0-3 3v6h4v5h12v-5h4v-6a3 3 0 0 0-3-3ZM8 5h8v3H8V5Zm0 14v-4h8v4H8Zm10-4h-2v2h2v-2Z"
+      />
+    </svg>
+  );
+}
+
 const nav = siteHeaderNav;
 
 function LocalTimeIST() {
@@ -122,7 +133,7 @@ function ScrollReadingBar() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed left-0 right-0 top-0 z-[60] h-[3px] overflow-hidden bg-[color:rgba(255,255,255,0.07)]"
+      className="ka-no-print pointer-events-none fixed left-0 right-0 top-0 z-[60] h-[3px] overflow-hidden bg-[color:rgba(255,255,255,0.07)]"
     >
       <div
         className={`h-full origin-left bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] ${
@@ -181,21 +192,13 @@ export function Portfolio() {
 
   const bookingUrl = (profile.availability as { headline: string; subline?: string; bookingUrl?: string }).bookingUrl;
 
-  const heroMotion = reduceMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: 44 },
-        animate: { opacity: 1, y: 0 },
-        transition: { type: "spring" as const, stiffness: 88, damping: 24, mass: 0.9 },
-      };
-
   return (
-    <div className="relative z-[1] min-h-dvh overflow-x-hidden">
+    <div className="portfolio-root relative z-[1] min-h-dvh overflow-x-hidden">
       <ScrollReadingBar />
-      <div className="pointer-events-none fixed inset-0 z-0 grid-overlay" />
+      <div className="ka-no-print pointer-events-none fixed inset-0 z-0 grid-overlay" />
 
       <header
-        className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-[background-color,box-shadow,backdrop-filter] duration-300 ${
+        className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-[background-color,box-shadow,backdrop-filter] duration-300 print:static ${
           headerScrolled
             ? "border-[color:var(--border)] bg-[color:rgba(5,5,8,0.92)] shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
             : "border-[color:var(--border)] bg-[color:rgba(7,7,10,0.76)]"
@@ -279,7 +282,7 @@ export function Portfolio() {
           </div>
 
           <nav
-            className="mt-4 hidden flex-wrap items-center justify-center gap-x-3 gap-y-2 border-t border-[color:rgba(255,255,255,0.06)] pt-4 sm:gap-x-4 md:flex"
+            className="mt-4 hidden flex-wrap items-center justify-center gap-x-3 gap-y-2 border-t border-[color:rgba(255,255,255,0.06)] pt-4 print:flex sm:gap-x-4 md:flex"
             aria-label="Primary"
           >
             {nav.map((item) => (
@@ -294,7 +297,7 @@ export function Portfolio() {
           </nav>
         </div>
 
-        <div className="border-t border-[color:var(--border)] bg-[color:rgba(7,7,10,0.35)] md:hidden">
+        <div className="border-t border-[color:var(--border)] bg-[color:rgba(7,7,10,0.35)] print:hidden md:hidden">
           <div className="mx-auto flex max-w-7xl gap-3 overflow-x-auto px-5 py-4 sm:px-8">
             {nav.map((item) => (
               <a
@@ -314,25 +317,24 @@ export function Portfolio() {
         tabIndex={-1}
         className="relative mx-auto w-full max-w-7xl px-5 pb-20 pt-10 sm:px-8 sm:pt-14 outline-none"
       >
-        <motion.section
+        <section
           ref={heroRef}
-          className="reveal relative overflow-hidden rounded-[2rem] border border-[color:var(--border)] bg-[color:var(--bg-elevated)] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] sm:p-10"
-          {...heroMotion}
+          className="hero-surface print-avoid-break relative overflow-hidden rounded-[2rem] border border-[color:var(--border)] bg-[color:var(--bg-elevated)] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] print:overflow-visible sm:p-10"
         >
           {reduceMotion ? (
             <>
-              <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.35),transparent_65%)] blur-2xl" />
-              <div className="pointer-events-none absolute -bottom-28 -left-28 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.35),transparent_65%)] blur-2xl" />
+              <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.35),transparent_65%)] blur-2xl print:hidden" />
+              <div className="pointer-events-none absolute -bottom-28 -left-28 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.35),transparent_65%)] blur-2xl print:hidden" />
             </>
           ) : (
             <>
               <motion.div
                 style={{ y: blobOrangeY, x: blobOrangeX }}
-                className="pointer-events-none absolute -right-24 -top-24 h-[22rem] w-[22rem] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.38),transparent_62%)] blur-2xl will-change-transform"
+                className="pointer-events-none absolute -right-24 -top-24 h-[22rem] w-[22rem] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.38),transparent_62%)] blur-2xl print:hidden will-change-transform"
               />
               <motion.div
                 style={{ y: blobVioletY, x: blobVioletX }}
-                className="pointer-events-none absolute -bottom-28 -left-28 h-[24rem] w-[24rem] rounded-full bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.36),transparent_62%)] blur-2xl will-change-transform"
+                className="pointer-events-none absolute -bottom-28 -left-28 h-[24rem] w-[24rem] rounded-full bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.36),transparent_62%)] blur-2xl print:hidden will-change-transform"
               />
             </>
           )}
@@ -471,7 +473,7 @@ export function Portfolio() {
               </div>
             </dl>
           </div>
-        </motion.section>
+        </section>
 
         <section id="about" className="mt-14 scroll-mt-28">
           <RevealOnScroll>
@@ -482,7 +484,7 @@ export function Portfolio() {
             ))}
           </div>
 
-          <div className="mt-10 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.02)]">
+          <div className="mt-10 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.02)] print-avoid-break">
             <div className="grid lg:grid-cols-2 lg:divide-x lg:divide-[color:var(--border)]">
               <div className="p-6 sm:p-8">
                 <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--faint)]">
@@ -540,8 +542,8 @@ export function Portfolio() {
                   const slideMotion = reduceMotion
                     ? {}
                     : {
-                        initial: { opacity: 0, x: isLeft ? -52 : 52, y: 18 },
-                        whileInView: { opacity: 1, x: 0, y: 0 },
+                        initial: { x: isLeft ? -52 : 52, y: 18 },
+                        whileInView: { x: 0, y: 0 },
                         viewport: { once: true, amount: 0.22, margin: "0px 0px -8% 0px" },
                         transition: {
                           type: "spring" as const,
@@ -553,7 +555,7 @@ export function Portfolio() {
                       };
 
                   const cardInner = (
-                    <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:rgba(11,11,16,0.92)] p-5 text-left shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur-md sm:p-6">
+                    <div className="print-avoid-break rounded-[1.35rem] border border-[color:var(--border)] bg-[color:rgba(11,11,16,0.92)] p-5 text-left shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur-md print:bg-[var(--bg-elevated)] print:shadow-[0_0_0_1px_var(--border)] print:backdrop-blur-none sm:p-6">
                       <div className="flex gap-3 sm:gap-4">
                         {job.logoSrc ? (
                           <div
@@ -605,7 +607,10 @@ export function Portfolio() {
                   );
 
                   return (
-                    <li key={expKey} className="relative grid grid-cols-1 sm:grid-cols-2 sm:items-start">
+                    <li
+                      key={expKey}
+                      className="relative grid grid-cols-1 break-inside-avoid sm:grid-cols-2 sm:items-start"
+                    >
                       <span
                         className="absolute top-9 left-1/2 z-[2] hidden h-3 w-3 -translate-x-1/2 rounded-full border-2 border-[color:var(--bg)] bg-[color:var(--accent)] shadow-[0_0_0_4px_rgba(255,90,31,0.2),0_0_20px_rgba(255,90,31,0.35)] sm:block"
                         aria-hidden
@@ -647,11 +652,11 @@ export function Portfolio() {
               {profile.impactHighlights.map((item, i) => (
                 <motion.article
                   key={item.title}
-                  className="flex h-full flex-col rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-6 motion-safe:transition-colors motion-safe:hover:border-[color:rgba(255,90,31,0.28)]"
+                  className="print-avoid-break flex h-full flex-col rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-6 motion-safe:transition-colors motion-safe:hover:border-[color:rgba(255,90,31,0.28)]"
                   {...(!reduceMotion
                     ? {
-                        initial: { opacity: 0, y: 28 },
-                        whileInView: { opacity: 1, y: 0 },
+                        initial: { y: 28 },
+                        whileInView: { y: 0 },
                         viewport: { once: true, margin: "-48px" },
                         transition: { delay: i * 0.07, duration: 0.48, ease: [0.22, 1, 0.36, 1] as const },
                       }
@@ -697,7 +702,7 @@ export function Portfolio() {
             {profile.skillGroups.map((group) => (
               <div
                 key={group.title}
-                className="rounded-[1.75rem] border border-[color:var(--border)] bg-[color:var(--bg-elevated)] p-6"
+                className="print-avoid-break rounded-[1.75rem] border border-[color:var(--border)] bg-[color:var(--bg-elevated)] p-6"
               >
                 <h3 className="text-sm font-semibold tracking-wide text-[color:var(--text)]">{group.title}</h3>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -730,7 +735,7 @@ export function Portfolio() {
                 href={post.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="focus-ring group flex h-full flex-col rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-6 transition-colors hover:bg-[color:rgba(255,255,255,0.055)] motion-safe:transition-transform motion-safe:hover:-translate-y-1"
+                className="focus-ring print-avoid-break group flex h-full flex-col rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-6 transition-colors hover:bg-[color:rgba(255,255,255,0.055)] motion-safe:transition-transform motion-safe:hover:-translate-y-1"
               >
                 <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--faint)]">
                   {post.readingMinutes} min read
@@ -778,8 +783,8 @@ export function Portfolio() {
             A live business site—design, copy, and performance tuned for real traffic.
           </p>
 
-          <div className="mt-8 overflow-hidden rounded-[2rem] border border-[color:var(--border)] bg-gradient-to-br from-[color:rgba(255,90,31,0.18)] via-[color:rgba(124,58,237,0.12)] to-[color:rgba(7,7,10,0.2)] p-[1px]">
-            <div className="rounded-[2rem] bg-[color:rgba(7,7,10,0.65)] p-7 backdrop-blur-xl sm:p-10">
+          <div className="print-avoid-break mt-8 overflow-hidden rounded-[2rem] border border-[color:var(--border)] bg-gradient-to-br from-[color:rgba(255,90,31,0.18)] via-[color:rgba(124,58,237,0.12)] to-[color:rgba(7,7,10,0.2)] p-[1px]">
+            <div className="rounded-[2rem] bg-[color:rgba(7,7,10,0.65)] p-7 backdrop-blur-xl print:bg-[var(--bg-elevated)] print:backdrop-blur-none sm:p-10">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div className="max-w-2xl">
                   <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--faint)]">
@@ -874,7 +879,7 @@ export function Portfolio() {
               {profile.siteCraft.signals.map((row) => (
                 <li
                   key={row.title}
-                  className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-5 sm:p-6"
+                  className="print-avoid-break rounded-[1.35rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-5 sm:p-6"
                 >
                   <h3 className="text-sm font-semibold tracking-tight text-[color:var(--text)]">{row.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-[color:var(--muted)]">{row.detail}</p>
@@ -908,7 +913,7 @@ export function Portfolio() {
               {profile.recommendations.map((rec) => (
                 <figure
                   key={`${rec.author}-${rec.quote.slice(0, 24)}`}
-                  className="motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 relative overflow-hidden rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-6 sm:p-7"
+                  className="print-avoid-break motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 relative overflow-hidden rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-6 sm:p-7"
                 >
                   <div
                     className="absolute left-5 top-5 text-5xl leading-none text-[color:rgba(255,255,255,0.12)] sm:left-6 sm:top-6"
@@ -936,7 +941,7 @@ export function Portfolio() {
                 {profile.linkedInPeerThemes.map((item) => (
                   <li
                     key={item.title}
-                    className="motion-safe:transition-[transform,border-color] motion-safe:hover:-translate-y-1 flex min-h-[140px] flex-col rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-4 motion-safe:duration-300 motion-safe:hover:border-[color:rgba(255,90,31,0.35)]"
+                    className="print-avoid-break motion-safe:transition-[transform,border-color] motion-safe:hover:-translate-y-1 flex min-h-[140px] flex-col rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-4 motion-safe:duration-300 motion-safe:hover:border-[color:rgba(255,90,31,0.35)]"
                   >
                     <span className="text-sm font-semibold text-[color:var(--text)]">{item.title}</span>
                     <span className="mt-2 text-xs leading-relaxed text-[color:var(--muted)]">{item.detail}</span>
@@ -960,15 +965,14 @@ export function Portfolio() {
                   <motion.li
                     key={item.title}
                     variants={{
-                      hidden: { opacity: 0, y: 40, scale: 0.93 },
+                      hidden: { y: 40, scale: 0.93 },
                       visible: {
-                        opacity: 1,
                         y: 0,
                         scale: 1,
                         transition: { type: "spring" as const, stiffness: 120, damping: 22 },
                       },
                     }}
-                    className="motion-safe:transition-[transform,border-color] motion-safe:hover:-translate-y-1 flex min-h-[140px] flex-col rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-4 motion-safe:duration-300 motion-safe:hover:border-[color:rgba(255,90,31,0.35)]"
+                    className="print-avoid-break motion-safe:transition-[transform,border-color] motion-safe:hover:-translate-y-1 flex min-h-[140px] flex-col rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-4 motion-safe:duration-300 motion-safe:hover:border-[color:rgba(255,90,31,0.35)]"
                   >
                     <span className="text-sm font-semibold text-[color:var(--text)]">{item.title}</span>
                     <span className="mt-2 text-xs leading-relaxed text-[color:var(--muted)]">{item.detail}</span>
@@ -987,8 +991,8 @@ export function Portfolio() {
         <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-8">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <motion.div
-              initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={reduceMotion ? { y: 0 } : { y: 28 }}
+              whileInView={{ y: 0 }}
               viewport={{ once: true, amount: 0.35 }}
               transition={
                 reduceMotion
@@ -999,14 +1003,16 @@ export function Portfolio() {
               <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Contact</h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-[color:var(--muted)]">
                 LinkedIn for a professional note, email for a thread or attachments, WhatsApp when scheduling is
-                simpler.
+                simpler. Export this page with a print-friendly layout using{" "}
+                <span className="font-semibold text-[color:var(--text)]">Print / Save as PDF</span> below, or{" "}
+                <span className="font-semibold text-[color:var(--text)]">Search (⌘K / Ctrl+K)</span> → “Print page”.
               </p>
             </motion.div>
 
             <motion.div
               className="grid w-full gap-3 sm:grid-cols-2 lg:max-w-2xl"
-              initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={reduceMotion ? { y: 0 } : { y: 32 }}
+              whileInView={{ y: 0 }}
               viewport={{ once: true, amount: 0.28 }}
               transition={
                 reduceMotion
@@ -1022,6 +1028,15 @@ export function Portfolio() {
                 <IconDownload className="h-4 w-4 shrink-0" aria-hidden />
                 Download resume
               </a>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                title="Opens your browser’s print dialog — choose Save as PDF if available"
+                className="focus-ring inline-flex min-h-[44px] touch-manipulation items-center justify-center gap-2 rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.04)] px-4 py-3 text-sm font-semibold text-[color:var(--text)] transition-colors hover:bg-[color:rgba(255,255,255,0.07)] print:hidden"
+              >
+                <IconPrint className="h-4 w-4 shrink-0" aria-hidden />
+                Print / Save as PDF
+              </button>
               <a
                 href={`mailto:${profile.contact.email}`}
                 className="focus-ring inline-flex min-h-[44px] touch-manipulation items-center justify-center gap-2 rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.04)] px-4 py-3 text-sm font-semibold text-[color:var(--text)] transition-colors hover:bg-[color:rgba(255,255,255,0.07)]"

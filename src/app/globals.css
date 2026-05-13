@@ -154,3 +154,158 @@ body {
     filter: brightness(1.06);
   }
 }
+
+/* —— Print / Save as PDF: light palette, no chrome, readable type —— */
+@media print {
+  @page {
+    margin: 14mm 12mm;
+    size: auto;
+  }
+
+  html {
+    scroll-behavior: auto;
+    overflow-x: visible !important;
+  }
+
+  /**
+   * Backdrop blur often paints as an empty layer in print engines — inner content disappears.
+   */
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .ka-no-print {
+    display: none !important;
+  }
+
+  :root {
+    color-scheme: light;
+    --bg: #ffffff;
+    --bg-elevated: #f4f4f7;
+    --bg-soft: #ececf2;
+    --border: rgba(15, 15, 18, 0.12);
+    --text: #0f0f12;
+    --muted: rgba(15, 15, 18, 0.72);
+    --faint: rgba(15, 15, 18, 0.48);
+    --accent: #c2410c;
+    --accent-2: #6d28d9;
+    --glow: rgba(194, 65, 12, 0.12);
+  }
+
+  body {
+    background: #fff !important;
+    background-image: none !important;
+    color: var(--text) !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .grid-overlay {
+    display: none !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  /**
+   * Keep cards / hero / job blocks from splitting across pages when they fit on one sheet.
+   * (Browser may still split if the block is taller than the page.)
+   */
+  .print-avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  html,
+  body {
+    min-height: 0 !important;
+  }
+
+  /**
+   * Full-viewport min-heights reserve a “ghost” first page in some Chromium print layouts.
+   */
+  #site-main,
+  .portfolio-root {
+    min-height: 0 !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    isolation: auto !important;
+  }
+
+  /**
+   * Framer / scroll-linked layers: Chromium often prints empty if transforms survive into layout.
+   */
+  .portfolio-root,
+  .portfolio-root * {
+    transform: none !important;
+    filter: none !important;
+    perspective: none !important;
+    will-change: auto !important;
+  }
+
+  .portfolio-root > main#main-content,
+  .portfolio-root > main#main-content *,
+  .portfolio-root > footer#contact,
+  .portfolio-root > footer#contact * {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .portfolio-root [style] {
+    opacity: 1 !important;
+  }
+
+  main#main-content {
+    position: relative !important;
+    z-index: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .hero-surface {
+    overflow: visible !important;
+  }
+
+  #experience ol > li {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  header {
+    position: static !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #fff !important;
+    border-bottom: 1px solid var(--border) !important;
+    break-inside: avoid;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  h2,
+  h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  section {
+    break-inside: auto;
+  }
+
+  main#main-content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.72em;
+    color: var(--faint);
+    font-weight: 500;
+    word-break: break-all;
+  }
+
+  main#main-content a[href^="#"]::after {
+    content: none;
+  }
+}

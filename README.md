@@ -13,7 +13,8 @@ Personal single-page portfolio for a senior frontend engineer: dark UI, strong t
 - **Toasts:** Feedback for clipboard and resume actions (`src/components/toast.tsx`).
 - **Motion & polish:** Optional splash screen, scroll-linked parallax, section reveals, reading progress bar at the top of the viewport.
 - **Accessibility:** Skip link, visible focus styles, `prefers-reduced-motion` respected for motion-heavy UI.
-- **SEO & sharing:** Metadata from `layout.tsx`, Person JSON-LD, Open Graph image route, `sitemap.xml`, `robots.txt`, web app manifest.
+- **SEO & sharing:** Metadata from `layout.tsx`, Person JSON-LD, dynamic **Open Graph** image (`src/app/opengraph-image.tsx` — name, role, years, chips, host from `NEXT_PUBLIC_SITE_URL`), `sitemap.xml`, `robots.txt`, web app manifest.
+- **Print / PDF:** Light palette and hidden chrome when printing or using “Save as PDF”. Use **Contact → Print / Save as PDF**, or **⌘K / Ctrl+K** → “Print page”, or the browser’s print shortcut — then pick “Save as PDF” in the dialog if your browser offers it (`@media print` in `src/app/globals.css`).
 
 ---
 

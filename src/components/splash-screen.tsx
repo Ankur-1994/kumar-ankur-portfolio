@@ -69,7 +69,7 @@ export default function SplashScreen() {
 
   return (
     <div
-      className={`splash-shell pointer-events-auto fixed inset-0 z-[400] flex min-h-[100svh] flex-col items-center justify-center gap-10 bg-[color:var(--bg)] px-6 ${
+      className={`ka-no-print splash-shell pointer-events-auto fixed inset-0 z-[400] flex min-h-[100svh] flex-col items-center justify-center gap-10 bg-[color:var(--bg)] px-6 ${
         phase === "exit" ? "splash-shell--exit" : ""
       }`}
       role="dialog"

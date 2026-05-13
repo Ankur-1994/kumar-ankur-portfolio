@@ -21,8 +21,8 @@ export function RevealOnScroll({ children, className = "" }: Props) {
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 48 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ y: 48 }}
+      whileInView={{ y: 0 }}
       viewport={{ once: true, amount: 0.12, margin: "0px 0px -12% 0px" }}
       transition={{
         type: "spring",
