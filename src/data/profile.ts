@@ -13,6 +13,11 @@ export type SkillGroup = {
   items: string[];
 };
 
+export type LinkedInPeerTheme = {
+  title: string;
+  detail: string;
+};
+
 export type Recommendation = {
   quote: string;
   author: string;
@@ -27,27 +32,40 @@ export type WritingItem = {
   readingMinutes: number;
 };
 
+export type ImpactHighlight = {
+  title: string;
+  company: string;
+  client: string;
+  problem: string;
+  outcome: string;
+  signals: string[];
+};
+
 export const profile = {
   name: "Kumar Ankur",
+  /** ISO date for first full-time engineering role — drives live “years of experience” copy ({{years}} = e.g. 10+) */
+  careerStartISO: "2015-10-01",
   /** Primary line under name in hero */
   role: "Senior Frontend Engineer · Frontend Architect",
   /** Sub-line for credibility scanning */
-  roleAccent: "AI-enabled UI engineering · 10+ years in production",
+  roleAccent: "Staff-level frontend · AI-enabled delivery · {{years}} years shipping production UI",
   location: "Bangalore, India",
   headline:
-    "I architect scalable enterprise web platforms—React/TypeScript systems, reusable component ecosystems, accessibility and performance at scale—while leading teams and shipping for Fortune 500 environments.",
+    "I architect customer-facing platforms the way top product orgs expect—clear ownership, measurable UX, and systems that stay maintainable after launch. I partner tightly with product, design, and platform teams on trade-offs, risk, and delivery sequencing.",
   expertiseChips: [
-    "10+ years shipping enterprise customer UIs",
+    "{{years}} years shipping enterprise customer UIs",
     "Fortune 500 delivery: McKinsey, Verizon, Marriott, AT&T",
     "AI-assisted engineering: Copilot, Cursor, ChatGPT in daily workflow",
     "Leadership: interviews, mentoring, architecture & code quality",
   ],
+  /** Hero status pill (under name) — {{years}} is replaced from careerStartISO */
+  heroStatusLine: "{{years}} years · Enterprise UI · Fortune 500 programs",
   heroCallouts: {
     focus: "Enterprise platforms · Fortune 500 programs",
-    proof: "10+ years in production frontend systems",
+    proof: "{{years}} years in production frontend systems",
   },
   summary: [
-    "Senior frontend engineer with 10+ years architecting high-performance, enterprise-grade web applications and frontend platforms using React, TypeScript, JavaScript, Angular, Redux, and modern delivery practices. I specialize in frontend architecture, reusable component systems, WCAG-minded accessibility, Core Web Vitals and Lighthouse-driven performance, enterprise UI platforms, SharePoint SPFx, and AI-assisted software development.",
+    "{{years}} years shipping enterprise-grade web applications and frontend platforms using React, TypeScript, JavaScript, Angular, Redux, and modern delivery practices. I specialize in frontend architecture, reusable component systems, WCAG-minded accessibility, Core Web Vitals and Lighthouse-driven performance, enterprise UI platforms, SharePoint SPFx, and AI-assisted software development.",
     "I have repeatedly delivered at scale for global organizations—McKinsey & Company (current), Verizon, Marriott, and AT&T—across ecommerce, telecom, hospitality, and collaboration domains. I am comfortable owning architecture discussions, raising the quality bar through reviews, and mentoring engineers while partnering with product, UX, and backend teams.",
     "I actively use GitHub Copilot, Cursor, and ChatGPT for AI-assisted debugging, automation, boilerplate acceleration, and productivity-focused workflows—without compromising code review, security awareness, or ownership. I also write on Medium (React, React Native maps, Firebase auth, UI animation) to share practical implementation notes with the community.",
   ],
@@ -207,6 +225,39 @@ export const profile = {
       ],
     },
   ] satisfies SkillGroup[],
+  /** Case-study style highlights — problem → outcome, signals recruiters scan for. */
+  impactHighlights: [
+    {
+      title: "Fortune 500 UI platform at scale",
+      company: "Nagarro",
+      client: "McKinsey & Company",
+      problem:
+        "Enterprise programs needed consistent, accessible UI across many teams and releases—without slowing product velocity.",
+      outcome:
+        "Led React/TypeScript architecture and reusable systems so squads shipped faster with fewer regressions; WCAG-minded patterns and performance budgets baked into the delivery rhythm.",
+      signals: ["React · TypeScript", "Design systems", "WCAG / a11y", "Core Web Vitals"],
+    },
+    {
+      title: "Micro-frontends & migration under real constraints",
+      company: "Nagarro",
+      client: "Verizon",
+      problem:
+        "Large legacy surface and mixed stacks made coordinated releases risky; teams needed a path to modern React without a big-bang rewrite.",
+      outcome:
+        "Defined atomic, micro-frontend-friendly structure and led Vue → React migration work so teams could evolve safely while still shipping to production.",
+      signals: ["Micro-frontends", "Vue → React", "Release risk", "Team enablement"],
+    },
+    {
+      title: "SharePoint & Microsoft 365 at enterprise depth",
+      company: "Mindtree",
+      client: "Marriott International",
+      problem:
+        "Stakeholders needed reliable intranet and collaboration experiences on SharePoint Online with governance and long-term maintainability.",
+      outcome:
+        "Delivered SPFx solutions, REST integrations, and Power Platform–aware workflows; supported production with clear ownership and iteration.",
+      signals: ["SPFx", "SharePoint Online", "REST APIs", "Production support"],
+    },
+  ] satisfies ImpactHighlight[],
   writing: [
     {
       title: "Integrate custom zoom in and zoom out in React Native Maps",
@@ -244,6 +295,7 @@ export const profile = {
     ],
     stack: ["Responsive UI", "Mobile-first UX", "Performance-aware delivery", "SEO-friendly structure"],
   },
+  /** Append { quote, author, context } for more verbatim LinkedIn recommendations. */
   recommendations: [
     {
       quote:
@@ -258,4 +310,36 @@ export const profile = {
       context: "Colleague recommendation (LinkedIn)",
     },
   ] satisfies Recommendation[],
+  /**
+   * Public LinkedIn profile lists two full written recommendations above.
+   * These five cards summarise recurring colleague-facing themes from the same public profile
+   * (skills, experience, and about) — not fabricated quotes.
+   */
+  linkedInPeerThemes: [
+    {
+      title: "Team leadership & mentoring",
+      detail:
+        "Leading frontend engineers, code reviews, and knowledge-sharing — consistent themes across my public experience and skills on LinkedIn.",
+    },
+    {
+      title: "React & modern JavaScript",
+      detail:
+        "Deep work in React, Redux, and the broader JS ecosystem for customer-facing products; reflected in roles from Nagarro through earlier teams.",
+    },
+    {
+      title: "Micro-frontend & modular UI",
+      detail:
+        "Vue-to-React migration and atomic, micro-frontend-friendly component structure called out explicitly in my current role description.",
+    },
+    {
+      title: "Sprint delivery & client demos",
+      detail:
+        "Scrum participation, requirement clarification with clients, and sprint demos are recurring responsibilities in my public profile narrative.",
+    },
+    {
+      title: "Production support & quality",
+      detail:
+        "Production support, A/B testing, and continuous improvement appear alongside performance and security-minded delivery in my LinkedIn story.",
+    },
+  ] satisfies LinkedInPeerTheme[],
 };

@@ -23,6 +23,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -35,14 +36,38 @@ html {
     opacity: 1 !important;
     transform: none !important;
   }
+
+  .splash-mark {
+    animation: none;
+  }
+
+  .splash-shell {
+    transition: none;
+  }
+
+  .splash-shell--exit {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 body {
-  background: radial-gradient(1200px 800px at 20% -10%, rgba(124, 58, 237, 0.18), transparent 55%),
-    radial-gradient(900px 700px at 90% 0%, rgba(255, 90, 31, 0.12), transparent 50%),
-    var(--bg);
+  background-color: var(--bg);
+  /* Soft ellipses + long fades into base — avoids “hard cut” bands from tight radial stops */
+  background-image:
+    radial-gradient(ellipse 120% 80% at 15% -25%, rgba(124, 58, 237, 0.22), rgba(124, 58, 237, 0.06) 38%, transparent 62%),
+    radial-gradient(ellipse 90% 70% at 92% 8%, rgba(255, 90, 31, 0.12), rgba(255, 90, 31, 0.03) 42%, transparent 68%),
+    radial-gradient(ellipse 85% 55% at 8% 72%, rgba(124, 58, 237, 0.08), transparent 58%),
+    radial-gradient(ellipse 110% 60% at 78% 88%, rgba(255, 90, 31, 0.07), transparent 55%);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+@media (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+  }
 }
 
 ::selection {
@@ -76,11 +101,11 @@ body {
 }
 
 .grid-overlay {
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
   background-size: 56px 56px;
-  mask-image: radial-gradient(closest-side at 50% 20%, #000 0%, transparent 75%);
-  opacity: 0.35;
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 25%, #000 0%, rgba(0, 0, 0, 0.45) 55%, transparent 88%);
+  opacity: 0.28;
 }
 
 .focus-ring:focus-visible {
@@ -90,7 +115,7 @@ body {
 
 @media (prefers-reduced-motion: no-preference) {
   .reveal {
-    animation: reveal-up 720ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+    animation: reveal-up 780ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
   }
 
   .splash-mark {
@@ -106,21 +131,6 @@ body {
   .splash-shell--exit {
     opacity: 0;
     transform: scale(1.04);
-    pointer-events: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .splash-mark {
-    animation: none;
-  }
-
-  .splash-shell {
-    transition: none;
-  }
-
-  .splash-shell--exit {
-    opacity: 0;
     pointer-events: none;
   }
 }

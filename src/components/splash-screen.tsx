@@ -1,29 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
-const STORAGE_KEY = "ka-portfolio-splash-seen";
+const SITE_MAIN_ID = "site-main";
 
 export default function SplashScreen() {
   const titleId = useId();
-  const [phase, setPhase] = useState<"run" | "exit" | "done">(() => {
-    if (typeof window === "undefined") return "run";
-    try {
-      return window.localStorage.getItem(STORAGE_KEY) ? "done" : "run";
-    } catch {
-      return "run";
-    }
-  });
+  /** Runs on every full page load / refresh (no localStorage). */
+  const [phase, setPhase] = useState<"run" | "exit" | "done">("run");
   const autoTimer = useRef<number | null>(null);
   const exitTimer = useRef<number | null>(null);
   const skipRef = useRef<HTMLButtonElement>(null);
 
   const finish = useCallback(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      /* ignore */
-    }
     setPhase("exit");
     exitTimer.current = window.setTimeout(() => setPhase("done"), 520);
   }, []);
@@ -49,6 +38,25 @@ export default function SplashScreen() {
       skipRef.current?.focus();
     }
   }, [phase]);
+
+  useLayoutEffect(() => {
+    const main = document.getElementById(SITE_MAIN_ID);
+    if (!main) return;
+    if (phase === "done") {
+      main.removeAttribute("inert");
+      queueMicrotask(() => {
+        document.getElementById("main-content")?.focus({ preventScroll: true });
+      });
+    } else {
+      main.setAttribute("inert", "");
+    }
+  }, [phase]);
+
+  useEffect(() => {
+    return () => {
+      document.getElementById(SITE_MAIN_ID)?.removeAttribute("inert");
+    };
+  }, []);
 
   useEffect(() => {
     return () => {

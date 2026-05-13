@@ -19,9 +19,16 @@ export function ScrollParallax() {
       const s1 = slow.current;
       const s2 = mid.current;
       const s3 = fast.current;
-      if (s1) s1.style.transform = `translate3d(0, ${scroll * 0.06}px, 0)`;
-      if (s2) s2.style.transform = `translate3d(0, ${scroll * 0.11}px, 0)`;
-      if (s3) s3.style.transform = `translate3d(0, ${scroll * 0.16}px, 0)`;
+      /* Stronger multi-layer parallax + slight horizontal drift (common on modern marketing sites). */
+      if (s1) {
+        s1.style.transform = `translate3d(${scroll * -0.04}px, ${scroll * 0.14}px, 0) scale(${1 + scroll * 0.00006})`;
+      }
+      if (s2) {
+        s2.style.transform = `translate3d(${scroll * 0.06}px, ${scroll * 0.28}px, 0) rotate(${scroll * 0.012}deg)`;
+      }
+      if (s3) {
+        s3.style.transform = `translate3d(${scroll * -0.03}px, ${scroll * 0.36}px, 0)`;
+      }
       frame.current = 0;
     };
 
@@ -41,20 +48,20 @@ export function ScrollParallax() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-0 min-h-[100dvh] overflow-x-clip"
       aria-hidden
     >
       <div
         ref={slow}
-        className="absolute -top-[20%] left-[-15%] h-[55vh] w-[55vh] rounded-full bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.22),transparent_68%)] blur-3xl will-change-transform"
+        className="absolute -left-[20%] -top-[25%] h-[min(120vw,85vh)] w-[min(120vw,85vh)] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(124,58,237,0.18)_0%,rgba(124,58,237,0.05)_42%,transparent_78%)] blur-3xl will-change-transform"
       />
       <div
         ref={mid}
-        className="absolute bottom-[-10%] right-[-20%] h-[60vh] w-[60vh] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.14),transparent_70%)] blur-3xl will-change-transform"
+        className="absolute -bottom-[18%] -right-[22%] h-[min(130vw,90vh)] w-[min(130vw,90vh)] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,90,31,0.12)_0%,rgba(255,90,31,0.04)_45%,transparent_80%)] blur-3xl will-change-transform"
       />
       <div
         ref={fast}
-        className="absolute left-[35%] top-[40%] h-[40vh] w-[40vh] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.08),transparent_72%)] blur-2xl will-change-transform"
+        className="absolute left-[28%] top-[38%] h-[min(95vw,65vh)] w-[min(95vw,65vh)] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,90,31,0.07)_0%,transparent_72%)] blur-3xl will-change-transform"
       />
     </div>
   );

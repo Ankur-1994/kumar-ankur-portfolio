@@ -1,6 +1,12 @@
+"use client";
+
 import type { SVGProps } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { profile } from "@/data/profile";
+import { getExperienceYears, injectYears } from "@/lib/career-years";
+import { RevealOnScroll } from "@/components/reveal-on-scroll";
 
 function IconLinkedIn(props: SVGProps<SVGSVGElement>) {
   return (
@@ -71,6 +77,7 @@ function IconDownload(props: SVGProps<SVGSVGElement>) {
 const nav = [
   { href: "#about", label: "About" },
   { href: "#experience", label: "Experience" },
+  { href: "#impact", label: "Impact" },
   { href: "#skills", label: "Skills" },
   { href: "#writing", label: "Writing" },
   { href: "#project", label: "Featured" },
@@ -78,90 +85,162 @@ const nav = [
   { href: "#contact", label: "Contact" },
 ] as const;
 
+function LocalTimeIST() {
+  const [label, setLabel] = useState("");
+
+  useEffect(() => {
+    const fmt = () =>
+      new Intl.DateTimeFormat("en-IN", {
+        timeZone: "Asia/Kolkata",
+        weekday: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date());
+
+    setLabel(fmt());
+    const id = window.setInterval(() => setLabel(fmt()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  if (!label) return <span className="text-[color:var(--faint)]">IST …</span>;
+  return <span title="Live clock in Asia/Kolkata">{label} IST</span>;
+}
+
 export function Portfolio() {
+  const reduceMotion = useReducedMotion();
+  const yoeLabel = useMemo(() => getExperienceYears(profile.careerStartISO).label, []);
+  const y = useMemo(() => (s: string) => injectYears(s, yoeLabel), [yoeLabel]);
+  const [copied, setCopied] = useState(false);
+
   const waHref = `https://wa.me/${profile.contact.whatsappE164}`;
   const resumeHref = profile.assets.resumePdfPath;
   const resumeDownload = profile.assets.resumeDownloadName;
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(profile.contact.email);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  const heroRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress: heroScroll } = useScroll({
+    target: heroRef,
+    offset: ["start end", "end start"],
+  });
+  const blobOrangeRaw = useTransform(heroScroll, [0, 1], [0, 110]);
+  const blobVioletRaw = useTransform(heroScroll, [0, 1], [0, -85]);
+  const blobOrangeY = useSpring(blobOrangeRaw, { stiffness: 72, damping: 26 });
+  const blobVioletY = useSpring(blobVioletRaw, { stiffness: 72, damping: 26 });
+  const blobOrangeXRaw = useTransform(heroScroll, [0, 1], [0, -28]);
+  const blobVioletXRaw = useTransform(heroScroll, [0, 1], [0, 36]);
+  const blobOrangeX = useSpring(blobOrangeXRaw, { stiffness: 72, damping: 26 });
+  const blobVioletX = useSpring(blobVioletXRaw, { stiffness: 72, damping: 26 });
+
+  const [headerScrolled, setHeaderScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setHeaderScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const heroMotion = reduceMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 44 },
+        animate: { opacity: 1, y: 0 },
+        transition: { type: "spring" as const, stiffness: 88, damping: 24, mass: 0.9 },
+      };
 
   return (
     <div className="relative z-[1] min-h-dvh overflow-x-hidden">
       <div className="pointer-events-none fixed inset-0 z-0 grid-overlay" />
 
-      <a
-        href="#main-content"
-        className="focus-ring sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-zinc-950"
+      <header
+        className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-[background-color,box-shadow,backdrop-filter] duration-300 ${
+          headerScrolled
+            ? "border-[color:var(--border)] bg-[color:rgba(5,5,8,0.92)] shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
+            : "border-[color:var(--border)] bg-[color:rgba(7,7,10,0.76)]"
+        }`}
       >
-        Skip to content
-      </a>
+        <div className="mx-auto w-full max-w-7xl px-5 py-4 sm:px-8 sm:py-5">
+          <div className="flex items-center justify-between gap-6 lg:gap-10">
+            <Link
+              href="#main-content"
+              className="focus-ring group flex min-w-0 shrink-0 items-center gap-3.5 rounded-xl outline-none sm:gap-4"
+            >
+              <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-2)] text-sm font-extrabold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)] motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-[1.04]">
+                KA
+                <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
+                  <span className="absolute -inset-10 rotate-12 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.35),transparent)] blur-sm" />
+                </span>
+              </span>
+              <span className="min-w-0 leading-tight">
+                <span className="block text-[0.95rem] font-semibold tracking-tight text-[color:var(--text)] sm:text-base">
+                  Kumar Ankur
+                </span>
+                <span className="mt-0.5 block text-xs text-[color:var(--muted)] sm:text-[13px]">
+                  Frontend · Architecture · AI
+                </span>
+              </span>
+            </Link>
 
-      <header className="sticky top-0 z-50 border-b border-[color:var(--border)] bg-[color:rgba(7,7,10,0.72)] backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <Link
-            href="#main-content"
-            className="focus-ring group flex items-center gap-3 rounded-xl outline-none"
+            <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
+              <a
+                className="focus-ring inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)] px-3 py-2 text-sm font-semibold text-[color:var(--text)] transition-[transform,background-color] hover:bg-[color:rgba(255,255,255,0.06)] motion-safe:hover:-translate-y-0.5 sm:px-5"
+                href={resumeHref}
+                download={resumeDownload}
+                title="Download resume PDF"
+              >
+                <IconDownload className="h-4 w-4 shrink-0 opacity-90" />
+                <span className="hidden sm:inline">Resume</span>
+              </a>
+              <a
+                className="focus-ring hidden min-h-[44px] items-center rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)] px-5 py-2.5 text-sm font-semibold text-[color:var(--text)] transition-[transform,background-color] hover:bg-[color:rgba(255,255,255,0.06)] motion-safe:hover:-translate-y-0.5 sm:inline-flex"
+                href={profile.links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                LinkedIn
+              </a>
+              <a
+                className="focus-ring inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-full bg-gradient-to-r from-[color:var(--accent)] to-[#ff8a4a] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_40px_var(--glow)] transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0"
+                href={profile.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub
+              </a>
+            </div>
+          </div>
+
+          <nav
+            className="mt-4 hidden flex-wrap items-center justify-center gap-x-3 gap-y-2 border-t border-[color:rgba(255,255,255,0.06)] pt-4 sm:gap-x-4 md:flex"
+            aria-label="Primary"
           >
-            <span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-2)] text-sm font-extrabold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)]">
-              KA
-              <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
-                <span className="absolute -inset-10 rotate-12 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.35),transparent)] blur-sm" />
-              </span>
-            </span>
-            <span className="leading-tight">
-              <span className="block text-sm font-semibold tracking-tight text-[color:var(--text)]">
-                Kumar Ankur
-              </span>
-              <span className="block text-xs text-[color:var(--muted)]">Frontend · Architecture · AI</span>
-            </span>
-          </Link>
-
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
             {nav.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="focus-ring inline-flex min-h-[44px] items-center rounded-full px-3 py-2 text-sm text-[color:var(--muted)] transition-colors hover:text-[color:var(--text)]"
+                className="focus-ring inline-flex min-h-[44px] items-center rounded-xl px-3.5 py-2 text-[13px] font-medium text-[color:var(--muted)] transition-[color,background-color] hover:bg-[color:rgba(255,255,255,0.05)] hover:text-[color:var(--text)] sm:px-4 sm:text-sm"
               >
                 {item.label}
               </a>
             ))}
           </nav>
-
-          <div className="flex items-center gap-2">
-            <a
-              className="focus-ring inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center gap-1.5 rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)] px-3 py-2 text-sm font-semibold text-[color:var(--text)] transition-colors hover:bg-[color:rgba(255,255,255,0.06)] sm:px-4"
-              href={resumeHref}
-              download={resumeDownload}
-              title="Download resume PDF"
-            >
-              <IconDownload className="h-4 w-4 shrink-0 opacity-90" />
-              <span className="hidden sm:inline">Resume</span>
-            </a>
-            <a
-              className="focus-ring hidden min-h-[44px] items-center rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)] px-4 py-2 text-sm font-semibold text-[color:var(--text)] transition-colors hover:bg-[color:rgba(255,255,255,0.06)] sm:inline-flex"
-              href={profile.links.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              LinkedIn
-            </a>
-            <a
-              className="focus-ring inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-full bg-gradient-to-r from-[color:var(--accent)] to-[#ff8a4a] px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_40px_var(--glow)] transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0"
-              href={profile.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub
-            </a>
-          </div>
         </div>
 
-        <div className="border-t border-[color:var(--border)] bg-[color:rgba(7,7,10,0.35)] lg:hidden">
-          <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 sm:px-6">
+        <div className="border-t border-[color:var(--border)] bg-[color:rgba(7,7,10,0.35)] md:hidden">
+          <div className="mx-auto flex max-w-7xl gap-3 overflow-x-auto px-5 py-4 sm:px-8">
             {nav.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="focus-ring whitespace-nowrap rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)] px-3 py-2 text-xs font-semibold text-[color:var(--muted)] min-h-[44px] inline-flex items-center touch-manipulation"
+                className="focus-ring inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)] px-4 py-2 text-[13px] font-semibold text-[color:var(--muted)] touch-manipulation"
               >
                 {item.label}
               </a>
@@ -173,16 +252,35 @@ export function Portfolio() {
       <main
         id="main-content"
         tabIndex={-1}
-        className="relative mx-auto w-full max-w-6xl px-4 pb-20 pt-10 sm:px-6 sm:pt-14 outline-none"
+        className="relative mx-auto w-full max-w-7xl px-5 pb-20 pt-10 sm:px-8 sm:pt-14 outline-none"
       >
-        <section className="reveal relative overflow-hidden rounded-[2rem] border border-[color:var(--border)] bg-[color:var(--bg-elevated)] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] sm:p-10">
-          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.35),transparent_65%)] blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-28 -left-28 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.35),transparent_65%)] blur-2xl" />
+        <motion.section
+          ref={heroRef}
+          className="reveal relative overflow-hidden rounded-[2rem] border border-[color:var(--border)] bg-[color:var(--bg-elevated)] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] sm:p-10"
+          {...heroMotion}
+        >
+          {reduceMotion ? (
+            <>
+              <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.35),transparent_65%)] blur-2xl" />
+              <div className="pointer-events-none absolute -bottom-28 -left-28 h-80 w-80 rounded-full bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.35),transparent_65%)] blur-2xl" />
+            </>
+          ) : (
+            <>
+              <motion.div
+                style={{ y: blobOrangeY, x: blobOrangeX }}
+                className="pointer-events-none absolute -right-24 -top-24 h-[22rem] w-[22rem] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.38),transparent_62%)] blur-2xl will-change-transform"
+              />
+              <motion.div
+                style={{ y: blobVioletY, x: blobVioletX }}
+                className="pointer-events-none absolute -bottom-28 -left-28 h-[24rem] w-[24rem] rounded-full bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.36),transparent_62%)] blur-2xl will-change-transform"
+              />
+            </>
+          )}
 
           <div className="relative">
             <p className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.04)] px-3 py-1 text-xs font-semibold text-[color:var(--muted)]">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(16,185,129,0.15)]" />
-              10+ years · Enterprise UI · Fortune 500 programs
+              {y(profile.heroStatusLine)}
             </p>
 
             <h1 className="mt-6 max-w-4xl text-balance text-4xl font-semibold tracking-tight text-[color:var(--text)] sm:text-5xl">
@@ -194,7 +292,7 @@ export function Portfolio() {
 
             {profile.roleAccent ? (
               <p className="mt-3 max-w-3xl text-pretty text-sm font-semibold text-[color:var(--text)] sm:text-base">
-                {profile.roleAccent}
+                {y(profile.roleAccent)}
               </p>
             ) : null}
 
@@ -204,12 +302,12 @@ export function Portfolio() {
 
             {profile.expertiseChips?.length ? (
               <ul className="mt-6 flex max-w-4xl flex-wrap gap-2">
-                {profile.expertiseChips.map((line) => (
+                {profile.expertiseChips.map((line, idx) => (
                   <li
-                    key={line}
+                    key={idx}
                     className="rounded-full border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.04)] px-3 py-1.5 text-xs font-semibold text-[color:var(--muted)]"
                   >
-                    {line}
+                    {y(line)}
                   </li>
                 ))}
               </ul>
@@ -267,14 +365,19 @@ export function Portfolio() {
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--faint)]">
                   Location
                 </dt>
-                <dd className="mt-2 text-sm font-medium text-[color:var(--text)]">{profile.location}</dd>
+                <dd className="mt-2 text-sm font-medium text-[color:var(--text)]">
+                  {profile.location}
+                  <span className="mt-1 block font-mono text-xs font-normal text-[color:var(--faint)]">
+                    <LocalTimeIST />
+                  </span>
+                </dd>
               </div>
               <div className="border-t border-[color:var(--border)] px-0 py-4 sm:border-t-0 sm:px-6 sm:py-0">
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--faint)]">
                   Focus
                 </dt>
                 <dd className="mt-2 text-sm font-medium text-[color:var(--text)]">
-                  {profile.heroCallouts?.focus ?? "Modernization, architecture, delivery"}
+                  {y(profile.heroCallouts?.focus ?? "Modernization, architecture, delivery")}
                 </dd>
               </div>
               <div className="border-t border-[color:var(--border)] px-0 py-4 sm:border-t-0 sm:pl-6 sm:py-0">
@@ -282,18 +385,19 @@ export function Portfolio() {
                   Proof
                 </dt>
                 <dd className="mt-2 text-sm font-medium text-[color:var(--text)]">
-                  {profile.heroCallouts?.proof ?? "Production systems + leadership"}
+                  {y(profile.heroCallouts?.proof ?? "Production systems + leadership")}
                 </dd>
               </div>
             </dl>
           </div>
-        </section>
+        </motion.section>
 
-        <section id="about" className="reveal reveal-delay-1 mt-14 scroll-mt-28">
-          <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">About</h2>
+        <section id="about" className="mt-14 scroll-mt-28">
+          <RevealOnScroll>
+            <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">About</h2>
           <div className="mt-6 space-y-4 text-pretty text-base leading-relaxed text-[color:var(--muted)]">
             {profile.summary.map((p, idx) => (
-              <p key={idx}>{p}</p>
+              <p key={idx}>{y(p)}</p>
             ))}
           </div>
 
@@ -333,54 +437,153 @@ export function Portfolio() {
               </div>
             </div>
           </div>
+          </RevealOnScroll>
         </section>
 
-        <section id="experience" className="reveal reveal-delay-2 mt-16 scroll-mt-28">
-          <div className="max-w-3xl">
-            <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Experience</h2>
-          </div>
+        <section id="experience" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Experience</h2>
+            </div>
 
-          <ol className="relative mt-12 max-w-3xl border-l border-[color:rgba(255,255,255,0.12)] pl-8 sm:pl-10">
-            {profile.experience.map((job, index) => (
-              <li
-                key={`${job.company}-${job.role}-${job.start}`}
-                className={`relative ${index < profile.experience.length - 1 ? "pb-14 sm:pb-16" : "pb-0"}`}
-              >
-                <span
-                  className="absolute top-2 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-[color:var(--accent)] shadow-[0_0_0_3px_var(--bg),0_0_12px_rgba(255,90,31,0.45)] left-[calc(-2rem+0.5px)] sm:left-[calc(-2.5rem+0.5px)]"
-                  aria-hidden
-                />
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-                  <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--faint)]">
-                    {job.start} — {job.end}
-                  </p>
-                  {job.client ? (
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)] sm:text-right">
-                      {job.client}
-                    </p>
-                  ) : null}
-                </div>
-                <h3 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--text)] sm:text-xl">
-                  {job.role}
-                </h3>
-                <p className="mt-0.5 text-sm text-[color:var(--muted)]">
-                  {job.company}
-                  <span className="text-[color:var(--faint)]"> · {job.location}</span>
-                </p>
-                <ul className="mt-5 space-y-3 border-t border-[color:rgba(255,255,255,0.06)] pt-5 text-sm leading-relaxed text-[color:var(--muted)]">
-                  {job.highlights.map((h) => (
-                    <li key={h} className="pl-0 sm:pl-1">
-                      <span className="text-[color:var(--faint)]">— </span>
-                      {h}
+            <div className="relative mx-auto mt-12 max-w-5xl">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute top-3 bottom-8 left-1/2 z-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-[color:rgba(255,90,31,0.45)] via-[color:rgba(255,255,255,0.12)] to-[color:rgba(255,255,255,0.06)] sm:block"
+              />
+              <ol className="relative z-[1] list-none space-y-12 sm:space-y-16">
+                {profile.experience.map((job, index) => {
+                  const isLeft = index % 2 === 0;
+                  const expKey = `${job.company}-${job.role}-${job.start}`;
+                  const slideMotion = reduceMotion
+                    ? {}
+                    : {
+                        initial: { opacity: 0, x: isLeft ? -52 : 52, y: 18 },
+                        whileInView: { opacity: 1, x: 0, y: 0 },
+                        viewport: { once: true, amount: 0.22, margin: "0px 0px -8% 0px" },
+                        transition: {
+                          type: "spring" as const,
+                          stiffness: 82,
+                          damping: 22,
+                          mass: 0.92,
+                          delay: index * 0.06,
+                        },
+                      };
+
+                  const cardInner = (
+                    <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:rgba(11,11,16,0.92)] p-5 text-left shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur-md sm:p-6">
+                      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--faint)]">
+                          {job.start} — {job.end}
+                        </p>
+                        {job.client ? (
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)] sm:text-right">
+                            {job.client}
+                          </p>
+                        ) : null}
+                      </div>
+                      <h3 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--text)] sm:text-xl">
+                        {job.role}
+                      </h3>
+                      <p className="mt-0.5 text-sm text-[color:var(--muted)]">
+                        {job.company}
+                        <span className="text-[color:var(--faint)]"> · {job.location}</span>
+                      </p>
+                      <ul className="mt-5 space-y-3 border-t border-[color:rgba(255,255,255,0.06)] pt-5 text-sm leading-relaxed text-[color:var(--muted)]">
+                        {job.highlights.map((h) => (
+                          <li key={h} className="pl-0 sm:pl-1">
+                            <span className="text-[color:var(--faint)]">— </span>
+                            {h}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+
+                  return (
+                    <li key={expKey} className="relative grid grid-cols-1 sm:grid-cols-2 sm:items-start">
+                      <span
+                        className="absolute top-9 left-1/2 z-[2] hidden h-3 w-3 -translate-x-1/2 rounded-full border-2 border-[color:var(--bg)] bg-[color:var(--accent)] shadow-[0_0_0_4px_rgba(255,90,31,0.2),0_0_20px_rgba(255,90,31,0.35)] sm:block"
+                        aria-hidden
+                      />
+                      {isLeft ? (
+                        <>
+                          <motion.div className="relative sm:pr-8 md:pr-12" {...slideMotion}>
+                            {cardInner}
+                          </motion.div>
+                          <div className="hidden min-h-0 sm:block" aria-hidden />
+                        </>
+                      ) : (
+                        <>
+                          <div className="hidden min-h-0 sm:block" aria-hidden />
+                          <motion.div className="relative sm:pl-8 md:pl-12" {...slideMotion}>
+                            {cardInner}
+                          </motion.div>
+                        </>
+                      )}
                     </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ol>
+                  );
+                })}
+              </ol>
+            </div>
+          </RevealOnScroll>
         </section>
 
-        <section id="skills" className="reveal reveal-delay-3 mt-16 scroll-mt-28">
+        <section id="impact" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Selected impact</h2>
+              <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">
+                Problem → outcome snapshots tied to named programs—how I think about ownership, risk, and delivery in
+                large product orgs.
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-6 lg:grid-cols-3">
+              {profile.impactHighlights.map((item, i) => (
+                <motion.article
+                  key={item.title}
+                  className="flex h-full flex-col rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-6 motion-safe:transition-colors motion-safe:hover:border-[color:rgba(255,90,31,0.28)]"
+                  {...(!reduceMotion
+                    ? {
+                        initial: { opacity: 0, y: 28 },
+                        whileInView: { opacity: 1, y: 0 },
+                        viewport: { once: true, margin: "-48px" },
+                        transition: { delay: i * 0.07, duration: 0.48, ease: [0.22, 1, 0.36, 1] as const },
+                      }
+                    : {})}
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--faint)]">
+                    {item.company} · {item.client}
+                  </p>
+                  <h3 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--text)]">{item.title}</h3>
+                  <div className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--muted)]">
+                    <p>
+                      <span className="font-semibold text-[color:var(--text)]">Problem. </span>
+                      {item.problem}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-[color:var(--text)]">Outcome. </span>
+                      {item.outcome}
+                    </p>
+                  </div>
+                  <ul className="mt-5 flex flex-wrap gap-2">
+                    {item.signals.map((s) => (
+                      <li key={s}>
+                        <span className="rounded-full border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.04)] px-2.5 py-0.5 text-[11px] font-semibold text-[color:var(--muted)]">
+                          {s}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.article>
+              ))}
+            </div>
+          </RevealOnScroll>
+        </section>
+
+        <section id="skills" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
           <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Skills</h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[color:var(--muted)]">
             Platforms, performance, and delivery patterns I use regularly in production.
@@ -406,9 +609,11 @@ export function Portfolio() {
               </div>
             ))}
           </div>
+          </RevealOnScroll>
         </section>
 
-        <section id="writing" className="reveal reveal-delay-4 mt-16 scroll-mt-28">
+        <section id="writing" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
           <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Writing (Medium)</h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[color:var(--muted)]">
             Technical notes on Medium—implementation detail and edge cases.
@@ -421,7 +626,7 @@ export function Portfolio() {
                 href={post.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="focus-ring group flex h-full flex-col rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-6 transition-colors hover:bg-[color:rgba(255,255,255,0.055)]"
+                className="focus-ring group flex h-full flex-col rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-6 transition-colors hover:bg-[color:rgba(255,255,255,0.055)] motion-safe:transition-transform motion-safe:hover:-translate-y-1"
               >
                 <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--faint)]">
                   {post.readingMinutes} min read
@@ -459,9 +664,11 @@ export function Portfolio() {
               <IconArrowUpRight className="h-4 w-4" />
             </a>
           </div>
+          </RevealOnScroll>
         </section>
 
-        <section id="project" className="reveal reveal-delay-4 mt-16 scroll-mt-28">
+        <section id="project" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
           <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Featured project</h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[color:var(--muted)]">
             A live business site—design, copy, and performance tuned for real traffic.
@@ -532,60 +739,139 @@ export function Portfolio() {
               </div>
             </div>
           </div>
+          </RevealOnScroll>
         </section>
 
-        <section id="recommendations" className="reveal mt-16 scroll-mt-28">
-          <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Recommendations</h2>
-
-          <div className="mt-8 grid gap-5 lg:grid-cols-2">
-            {profile.recommendations.map((rec) => (
-              <figure
-                key={`${rec.author}-${rec.quote.slice(0, 24)}`}
-                className="relative overflow-hidden rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-7"
+        <section id="recommendations" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Recommendations</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[color:var(--muted)]">
+                  Verbatim written recommendations from my public LinkedIn, followed by five recurring colleague-facing
+                  themes from the same public profile (skills, experience, and about).
+                </p>
+              </div>
+              <a
+                href={profile.links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="focus-ring shrink-0 rounded-full border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.06)] px-4 py-2.5 text-sm font-semibold text-[color:var(--text)] motion-safe:transition-transform motion-safe:hover:-translate-y-0.5"
               >
-                <div className="absolute left-6 top-6 text-5xl leading-none text-[color:rgba(255,255,255,0.12)]" aria-hidden>
-                  “
-                </div>
-                <blockquote className="relative mt-6 text-sm leading-relaxed text-[color:var(--muted)]">
-                  {rec.quote}
-                </blockquote>
-                <figcaption className="mt-6 border-t border-[color:var(--border)] pt-5">
-                  <div className="text-sm font-semibold text-[color:var(--text)]">{rec.author}</div>
-                  <div className="mt-1 text-xs text-[color:var(--faint)]">{rec.context}</div>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+                LinkedIn
+              </a>
+            </div>
 
-          <p className="mt-10 text-center text-sm text-[color:var(--muted)]">
-            <a
-              href={profile.links.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="focus-ring font-semibold text-[color:var(--text)] underline-offset-4 hover:underline"
-              aria-label="Kumar Ankur on LinkedIn (opens in new tab)"
-            >
-              LinkedIn profile
-            </a>
-          </p>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2">
+              {profile.recommendations.map((rec) => (
+                <figure
+                  key={`${rec.author}-${rec.quote.slice(0, 24)}`}
+                  className="motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 relative overflow-hidden rounded-[1.75rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-6 sm:p-7"
+                >
+                  <div
+                    className="absolute left-5 top-5 text-5xl leading-none text-[color:rgba(255,255,255,0.12)] sm:left-6 sm:top-6"
+                    aria-hidden
+                  >
+                    “
+                  </div>
+                  <blockquote className="relative mt-6 text-sm leading-relaxed text-[color:var(--muted)]">
+                    {rec.quote}
+                  </blockquote>
+                  <figcaption className="mt-6 border-t border-[color:var(--border)] pt-5">
+                    <div className="text-sm font-semibold text-[color:var(--text)]">{rec.author}</div>
+                    <div className="mt-1 text-xs text-[color:var(--faint)]">{rec.context}</div>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+
+            <h3 className="mt-14 text-sm font-semibold uppercase tracking-[0.14em] text-[color:var(--faint)]">
+              Colleague-facing themes (public LinkedIn)
+            </h3>
+
+            {reduceMotion ? (
+              <ul className="mt-4 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-5">
+                {profile.linkedInPeerThemes.map((item) => (
+                  <li
+                    key={item.title}
+                    className="motion-safe:transition-[transform,border-color] motion-safe:hover:-translate-y-1 flex min-h-[140px] flex-col rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-4 motion-safe:duration-300 motion-safe:hover:border-[color:rgba(255,90,31,0.35)]"
+                  >
+                    <span className="text-sm font-semibold text-[color:var(--text)]">{item.title}</span>
+                    <span className="mt-2 text-xs leading-relaxed text-[color:var(--muted)]">{item.detail}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <motion.ul
+                className="mt-4 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-5"
+                variants={{
+                  hidden: {},
+                  visible: {
+                    transition: { staggerChildren: 0.09, delayChildren: 0.05 },
+                  },
+                }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.22 }}
+              >
+                {profile.linkedInPeerThemes.map((item) => (
+                  <motion.li
+                    key={item.title}
+                    variants={{
+                      hidden: { opacity: 0, y: 40, scale: 0.93 },
+                      visible: {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        transition: { type: "spring" as const, stiffness: 120, damping: 22 },
+                      },
+                    }}
+                    className="motion-safe:transition-[transform,border-color] motion-safe:hover:-translate-y-1 flex min-h-[140px] flex-col rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-4 motion-safe:duration-300 motion-safe:hover:border-[color:rgba(255,90,31,0.35)]"
+                  >
+                    <span className="text-sm font-semibold text-[color:var(--text)]">{item.title}</span>
+                    <span className="mt-2 text-xs leading-relaxed text-[color:var(--muted)]">{item.detail}</span>
+                  </motion.li>
+                ))}
+              </motion.ul>
+            )}
+          </RevealOnScroll>
         </section>
       </main>
 
       <footer
         id="contact"
-        className="relative border-t border-[color:var(--border)] bg-[color:rgba(7,7,10,0.65)] py-14"
+        className="relative z-[1] border-t border-[color:var(--border)] bg-[color:var(--bg)] py-16 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-32 before:bg-gradient-to-b before:from-[rgba(255,255,255,0.04)] before:to-transparent"
       >
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+        <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-8">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-            <div>
+            <motion.div
+              initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { type: "spring" as const, stiffness: 100, damping: 26, mass: 0.88 }
+              }
+            >
               <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Contact</h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-[color:var(--muted)]">
                 LinkedIn for a professional note, email for a thread or attachments, WhatsApp when scheduling is
                 simpler.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="grid w-full gap-3 sm:grid-cols-2 lg:max-w-2xl">
+            <motion.div
+              className="grid w-full gap-3 sm:grid-cols-2 lg:max-w-2xl"
+              initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.28 }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { type: "spring" as const, stiffness: 95, damping: 24, mass: 0.9, delay: 0.08 }
+              }
+            >
               <a
                 href={resumeHref}
                 download={resumeDownload}
@@ -601,6 +887,19 @@ export function Portfolio() {
                 <IconMail className="h-4 w-4 shrink-0" aria-hidden />
                 Mail me
               </a>
+              <button
+                type="button"
+                onClick={() => void copyEmail()}
+                aria-label={
+                  copied
+                    ? "Email address copied to clipboard"
+                    : `Copy ${profile.contact.email} to clipboard`
+                }
+                className="focus-ring inline-flex min-h-[44px] touch-manipulation items-center justify-center gap-2 rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.04)] px-4 py-3 text-sm font-semibold text-[color:var(--text)] transition-colors hover:bg-[color:rgba(255,255,255,0.07)]"
+              >
+                <IconMail className="h-4 w-4 shrink-0 opacity-70" aria-hidden />
+                <span aria-live="polite">{copied ? "Email copied" : "Copy email"}</span>
+              </button>
               <a
                 href={profile.links.linkedin}
                 target="_blank"
@@ -628,7 +927,7 @@ export function Portfolio() {
                 <IconGitHub className="h-4 w-4 shrink-0" aria-hidden />
                 GitHub
               </a>
-            </div>
+            </motion.div>
           </div>
 
           <div className="mt-10 border-t border-[color:var(--border)] pt-8 text-xs text-[color:var(--faint)]">

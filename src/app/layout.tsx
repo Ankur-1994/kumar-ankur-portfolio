@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { profile } from "@/data/profile";
+import { getExperienceYears, injectYears } from "@/lib/career-years";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -19,8 +20,11 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
 
 const titleDefault = "Kumar Ankur | Senior Frontend Engineer & Architect";
-const description =
-  "Kumar Ankur — 10+ years building enterprise React and TypeScript platforms for Fortune 500 programs. Frontend architecture, performance, accessibility, SharePoint SPFx, and AI-assisted engineering (Copilot, Cursor, ChatGPT).";
+const { label: yoeLabel } = getExperienceYears(profile.careerStartISO);
+const description = injectYears(
+  "Kumar Ankur — {{years}} years building enterprise React and TypeScript platforms for Fortune 500 programs. Frontend architecture, performance, accessibility, SharePoint SPFx, and AI-assisted engineering (Copilot, Cursor, ChatGPT).",
+  yoeLabel,
+);
 
 export const viewport: Viewport = {
   width: "device-width",
