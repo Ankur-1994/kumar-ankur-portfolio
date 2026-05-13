@@ -4,7 +4,10 @@ import type { SVGProps } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
+import { dispatchOpenCommandPalette } from "@/components/command-palette";
+import { useToast } from "@/components/toast";
 import { profile } from "@/data/profile";
+import { siteHeaderNav } from "@/data/site-nav";
 import { getExperienceYears, injectYears } from "@/lib/career-years";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 
@@ -74,16 +77,7 @@ function IconDownload(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-const nav = [
-  { href: "#about", label: "About" },
-  { href: "#experience", label: "Experience" },
-  { href: "#impact", label: "Impact" },
-  { href: "#skills", label: "Skills" },
-  { href: "#writing", label: "Writing" },
-  { href: "#project", label: "Featured" },
-  { href: "#recommendations", label: "Recommendations" },
-  { href: "#contact", label: "Contact" },
-] as const;
+const nav = siteHeaderNav;
 
 function LocalTimeIST() {
   const [label, setLabel] = useState("");
@@ -106,8 +100,43 @@ function LocalTimeIST() {
   return <span title="Live clock in Asia/Kolkata">{label} IST</span>;
 }
 
+function ScrollReadingBar() {
+  const [progress, setProgress] = useState(0);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const tick = () => {
+      const doc = document.documentElement;
+      const maxScroll = doc.scrollHeight - window.innerHeight;
+      setProgress(maxScroll <= 0 ? 0 : Math.min(1, window.scrollY / maxScroll));
+    };
+    tick();
+    window.addEventListener("scroll", tick, { passive: true });
+    window.addEventListener("resize", tick);
+    return () => {
+      window.removeEventListener("scroll", tick);
+      window.removeEventListener("resize", tick);
+    };
+  }, []);
+
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none fixed left-0 right-0 top-0 z-[60] h-[3px] overflow-hidden bg-[color:rgba(255,255,255,0.07)]"
+    >
+      <div
+        className={`h-full origin-left bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] ${
+          reduceMotion ? "" : "transition-transform duration-150 ease-out"
+        }`}
+        style={{ transform: `scaleX(${progress})` }}
+      />
+    </div>
+  );
+}
+
 export function Portfolio() {
   const reduceMotion = useReducedMotion();
+  const { showToast } = useToast();
   const yoeLabel = useMemo(() => getExperienceYears(profile.careerStartISO).label, []);
   const y = useMemo(() => (s: string) => injectYears(s, yoeLabel), [yoeLabel]);
   const [copied, setCopied] = useState(false);
@@ -120,9 +149,11 @@ export function Portfolio() {
     try {
       await navigator.clipboard.writeText(profile.contact.email);
       setCopied(true);
+      showToast("Email copied to clipboard");
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
+      showToast("Copy failed — try Mail me below");
     }
   };
 
@@ -148,6 +179,8 @@ export function Portfolio() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const bookingUrl = (profile.availability as { headline: string; subline?: string; bookingUrl?: string }).bookingUrl;
+
   const heroMotion = reduceMotion
     ? {}
     : {
@@ -158,6 +191,7 @@ export function Portfolio() {
 
   return (
     <div className="relative z-[1] min-h-dvh overflow-x-hidden">
+      <ScrollReadingBar />
       <div className="pointer-events-none fixed inset-0 z-0 grid-overlay" />
 
       <header
@@ -190,6 +224,32 @@ export function Portfolio() {
             </Link>
 
             <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => dispatchOpenCommandPalette()}
+                className="focus-ring inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)] px-3 py-2 text-sm font-semibold text-[color:var(--text)] md:hidden"
+                aria-label="Open command palette"
+                title="Search (⌘K or Ctrl+K)"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4 text-[color:var(--muted)]" aria-hidden>
+                  <path
+                    fill="currentColor"
+                    d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                  />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => dispatchOpenCommandPalette()}
+                className="focus-ring hidden min-h-[44px] items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)] px-3 py-2 text-sm font-semibold text-[color:var(--text)] transition-[transform,background-color] hover:bg-[color:rgba(255,255,255,0.06)] motion-safe:hover:-translate-y-0.5 md:inline-flex"
+                aria-label="Open command palette. Keyboard shortcut Control K or Command K."
+                title="Jump anywhere (⌘K or Ctrl+K)"
+              >
+                <span className="text-[color:var(--muted)]">Search</span>
+                <kbd className="hidden rounded border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.06)] px-1.5 py-0.5 font-mono text-[10px] font-normal text-[color:var(--faint)] lg:inline">
+                  ⌘K
+                </kbd>
+              </button>
               <a
                 className="focus-ring inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)] px-3 py-2 text-sm font-semibold text-[color:var(--text)] transition-[transform,background-color] hover:bg-[color:rgba(255,255,255,0.06)] motion-safe:hover:-translate-y-0.5 sm:px-5"
                 href={resumeHref}
@@ -312,6 +372,27 @@ export function Portfolio() {
                 ))}
               </ul>
             ) : null}
+
+            <div className="mt-6 rounded-2xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-4 sm:p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--faint)]">
+                Availability
+              </p>
+              <p className="mt-2 text-sm font-semibold text-[color:var(--text)]">{profile.availability.headline}</p>
+              {profile.availability.subline ? (
+                <p className="mt-1.5 text-xs leading-relaxed text-[color:var(--muted)]">{profile.availability.subline}</p>
+              ) : null}
+              {bookingUrl ? (
+                <a
+                  href={bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="focus-ring mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.06)] px-4 py-2.5 text-sm font-semibold text-[color:var(--text)] transition-colors hover:bg-[color:rgba(255,255,255,0.1)]"
+                >
+                  Book a short intro
+                  <IconArrowUpRight className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
+                </a>
+              ) : null}
+            </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <a
@@ -455,6 +536,7 @@ export function Portfolio() {
                 {profile.experience.map((job, index) => {
                   const isLeft = index % 2 === 0;
                   const expKey = `${job.company}-${job.role}-${job.start}`;
+                  const logoWide = job.company === "MakeMyTrip";
                   const slideMotion = reduceMotion
                     ? {}
                     : {
@@ -472,23 +554,45 @@ export function Portfolio() {
 
                   const cardInner = (
                     <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:rgba(11,11,16,0.92)] p-5 text-left shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur-md sm:p-6">
-                      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-                        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--faint)]">
-                          {job.start} — {job.end}
-                        </p>
-                        {job.client ? (
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)] sm:text-right">
-                            {job.client}
-                          </p>
+                      <div className="flex gap-3 sm:gap-4">
+                        {job.logoSrc ? (
+                          <div
+                            className={`relative flex shrink-0 items-center justify-center rounded-xl border border-black/10 bg-white shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] sm:rounded-2xl ${
+                              logoWide
+                                ? "h-11 w-[7.5rem] px-1.5 py-1 sm:h-12 sm:w-[8.75rem] sm:px-2 sm:py-1.5"
+                                : "h-12 w-12 p-1.5 sm:h-[3.25rem] sm:w-[3.25rem] sm:p-2"
+                            }`}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element -- local SVGs need natural aspect; img scales more predictably than next/image here */}
+                            <img
+                              src={job.logoSrc}
+                              alt=""
+                              className="h-full w-full object-contain object-center"
+                              decoding="async"
+                              aria-hidden
+                            />
+                          </div>
                         ) : null}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--faint)]">
+                              {job.start} — {job.end}
+                            </p>
+                            {job.client ? (
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)] sm:text-right">
+                                {job.client}
+                              </p>
+                            ) : null}
+                          </div>
+                          <h3 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--text)] sm:text-xl">
+                            {job.role}
+                          </h3>
+                          <p className="mt-0.5 text-sm text-[color:var(--muted)]">
+                            {job.company}
+                            <span className="text-[color:var(--faint)]"> · {job.location}</span>
+                          </p>
+                        </div>
                       </div>
-                      <h3 className="mt-2 text-lg font-semibold tracking-tight text-[color:var(--text)] sm:text-xl">
-                        {job.role}
-                      </h3>
-                      <p className="mt-0.5 text-sm text-[color:var(--muted)]">
-                        {job.company}
-                        <span className="text-[color:var(--faint)]"> · {job.location}</span>
-                      </p>
                       <ul className="mt-5 space-y-3 border-t border-[color:rgba(255,255,255,0.06)] pt-5 text-sm leading-relaxed text-[color:var(--muted)]">
                         {job.highlights.map((h) => (
                           <li key={h} className="pl-0 sm:pl-1">
@@ -739,6 +843,44 @@ export function Portfolio() {
               </div>
             </div>
           </div>
+          </RevealOnScroll>
+        </section>
+
+        <section id="craft" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
+            <div className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--faint)]">Live sample</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[color:var(--text)]">This site as a product UI</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[color:var(--muted)]">
+                {profile.siteCraft.intro}
+              </p>
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[color:var(--muted)]">
+                {profile.siteCraft.paletteHint}{" "}
+                <button
+                  type="button"
+                  onClick={() => dispatchOpenCommandPalette()}
+                  className="focus-ring font-semibold text-[color:var(--accent)] underline decoration-[color:rgba(255,90,31,0.45)] underline-offset-4 hover:decoration-[color:var(--accent)]"
+                >
+                  Try it now
+                </button>
+                .
+              </p>
+              <p className="mt-3 text-xs text-[color:var(--faint)]">
+                Last content pass on this page: <span className="text-[color:var(--muted)]">{profile.siteCraft.lastUpdatedNote}</span>
+              </p>
+            </div>
+
+            <ul className="mt-10 grid list-none gap-4 p-0 sm:grid-cols-2">
+              {profile.siteCraft.signals.map((row) => (
+                <li
+                  key={row.title}
+                  className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-5 sm:p-6"
+                >
+                  <h3 className="text-sm font-semibold tracking-tight text-[color:var(--text)]">{row.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--muted)]">{row.detail}</p>
+                </li>
+              ))}
+            </ul>
           </RevealOnScroll>
         </section>
 

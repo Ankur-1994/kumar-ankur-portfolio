@@ -5,6 +5,8 @@ export type ExperienceItem = {
   start: string;
   end: string;
   client?: string;
+  /** Path under `/public` — e.g. `/logos/nagarro.svg` */
+  logoSrc?: string;
   highlights: string[];
 };
 
@@ -22,6 +24,11 @@ export type Recommendation = {
   quote: string;
   author: string;
   context: string;
+};
+
+export type SiteCraftSignal = {
+  title: string;
+  detail: string;
 };
 
 export type WritingItem = {
@@ -54,7 +61,7 @@ export const profile = {
     "I architect customer-facing platforms the way top product orgs expect—clear ownership, measurable UX, and systems that stay maintainable after launch. I partner tightly with product, design, and platform teams on trade-offs, risk, and delivery sequencing.",
   expertiseChips: [
     "{{years}} years shipping enterprise customer UIs",
-    "Fortune 500 delivery: McKinsey, Verizon, Marriott, AT&T",
+    "Fortune 500 & scale: McKinsey, Verizon, Marriott, AT&T · MakeMyTrip (consumer travel)",
     "AI-assisted engineering: Copilot, Cursor, ChatGPT in daily workflow",
     "Leadership: interviews, mentoring, architecture & code quality",
   ],
@@ -66,7 +73,7 @@ export const profile = {
   },
   summary: [
     "{{years}} years shipping enterprise-grade web applications and frontend platforms using React, TypeScript, JavaScript, Angular, Redux, and modern delivery practices. I specialize in frontend architecture, reusable component systems, WCAG-minded accessibility, Core Web Vitals and Lighthouse-driven performance, enterprise UI platforms, SharePoint SPFx, and AI-assisted software development.",
-    "I have repeatedly delivered at scale for global organizations—McKinsey & Company (current), Verizon, Marriott, and AT&T—across ecommerce, telecom, hospitality, and collaboration domains. I am comfortable owning architecture discussions, raising the quality bar through reviews, and mentoring engineers while partnering with product, UX, and backend teams.",
+    "I have repeatedly delivered at scale for global organizations—McKinsey & Company (current), Verizon, MakeMyTrip, Marriott, and AT&T—across ecommerce, telecom, travel marketplaces, hospitality, and collaboration domains. I am comfortable owning architecture discussions, raising the quality bar through reviews, and mentoring engineers while partnering with product, UX, and backend teams.",
     "I actively use GitHub Copilot, Cursor, and ChatGPT for AI-assisted debugging, automation, boilerplate acceleration, and productivity-focused workflows—without compromising code review, security awareness, or ownership. I also write on Medium (React, React Native maps, Firebase auth, UI animation) to share practical implementation notes with the community.",
   ],
   links: {
@@ -83,6 +90,11 @@ export const profile = {
   contact: {
     email: "akakankur81@gmail.com",
     whatsappE164: "919599015901",
+  },
+  /** Recruiter-facing availability — optional bookingUrl: your Cal.com / Calendly link shows “Book a short intro”. */
+  availability: {
+    headline: "Open to senior / staff frontend & frontend-architect roles (IC)",
+    subline: "India · Remote-friendly · Typical notice: per current employer agreement",
   },
   leadership: [
     "Led and mentored frontend teams (up to ~5 engineers) across enterprise product initiatives.",
@@ -106,6 +118,7 @@ export const profile = {
       role: "Senior Software Engineer",
       location: "India (client-facing)",
       client: "McKinsey & Company",
+      logoSrc: "/logos/nagarro.svg",
       start: "2024",
       end: "Present",
       highlights: [
@@ -119,10 +132,25 @@ export const profile = {
       ],
     },
     {
+      company: "MakeMyTrip",
+      role: "Lead Software Engineer",
+      location: "Gurugram, India",
+      logoSrc: "/logos/makemytrip.svg",
+      start: "2022",
+      end: "2023",
+      highlights: [
+        "Drove technical excellence across the team—code quality, performance, and security standards—with clear ownership of delivery and reviews.",
+        "Partnered with product, design, and cross-functional teams on requirements, architecture, and roadmaps for the MMT mobile product.",
+        "Built and evolved the host-app funnel so hosts could onboard, complete mandatory fields, and submit details for QC verification.",
+        "Explored a POC to ship the Host App independently via OTA updates (Microsoft App Center / CodePush-style delivery) so releases could move faster than the main app bundle.",
+      ],
+    },
+    {
       company: "Publicis Sapient",
       role: "Senior Software Engineer",
       location: "India (client-facing)",
       client: "Verizon",
+      logoSrc: "/logos/publicissapient.svg",
       start: "2020",
       end: "2024",
       highlights: [
@@ -139,6 +167,7 @@ export const profile = {
       role: "Software Engineer",
       location: "India (client-facing)",
       client: "Marriott",
+      logoSrc: "/logos/publicissapient.svg",
       start: "2018",
       end: "2020",
       highlights: [
@@ -154,6 +183,7 @@ export const profile = {
       role: "Software Engineer",
       location: "India (client-facing)",
       client: "AT&T",
+      logoSrc: "/logos/techmahindra.svg",
       start: "2015",
       end: "2018",
       highlights: [
@@ -342,4 +372,39 @@ export const profile = {
         "Production support, A/B testing, and continuous improvement appear alongside performance and security-minded delivery in my LinkedIn story.",
     },
   ] satisfies LinkedInPeerTheme[],
+  /** How this portfolio demonstrates product-grade frontend — edit as the stack evolves. */
+  siteCraft: {
+    intro:
+      "The same UX and accessibility patterns shipping teams use—implemented here so the site is a live sample of how I build.",
+    paletteHint: "Press ⌘K or Ctrl+K for quick navigation and actions—the command palette pattern used in Linear, Vercel, and Slack.",
+    /** Human-readable; bump when you ship meaningful site changes. */
+    lastUpdatedNote: "May 2026",
+    signals: [
+      {
+        title: "Reading progress",
+        detail:
+          "A slim page-progress bar at the top reflects how far you’ve scrolled—common in long-form product and docs sites.",
+      },
+      {
+        title: "Command palette (⌘K / Ctrl+K)",
+        detail:
+          "Keyboard-first navigation, fuzzy filtering, focus trap, and Escape to dismiss—mirrors internal tools in modern product orgs.",
+      },
+      {
+        title: "Accessibility & motion",
+        detail:
+          "Skip link, focus-visible rings, inert on the splash dialog, live regions where needed, and prefers-reduced-motion respected for parallax, scroll reveals, and Framer Motion.",
+      },
+      {
+        title: "Scroll & layout craft",
+        detail:
+          "Parallax atmosphere, spring-based section reveals, and a zig-zag experience timeline—intentional motion without blocking content.",
+      },
+      {
+        title: "Discovery & performance posture",
+        detail:
+          "Semantic structure, JSON-LD Person schema, sitemap/robots, and static-friendly Next.js App Router delivery.",
+      },
+    ] satisfies SiteCraftSignal[],
+  },
 };
