@@ -48,6 +48,32 @@ export type ImpactHighlight = {
   signals: string[];
 };
 
+/** Scannable outcomes for hiring managers — tie numbers to named programs. */
+export type ProofOutcome = {
+  metric: string;
+  label: string;
+  where: string;
+};
+
+export type DailyTool = {
+  name: string;
+  oneLiner: string;
+};
+
+export type PerformanceNote = {
+  intro: string;
+  howMeasured: string;
+  bullets: string[];
+};
+
+export type ContactCta = {
+  /** Prefilled mailto subject — hiring manager replaces bracketed role. */
+  emailSubject: string;
+  /** Optional starter body so replies are structured. */
+  emailBody: string;
+  primaryButtonLabel: string;
+};
+
 export const profile = {
   name: "Kumar Ankur",
   /** ISO date for first full-time engineering role — drives live “years of experience” copy ({{years}} = e.g. 10+) */
@@ -91,7 +117,10 @@ export const profile = {
     email: "akakankur81@gmail.com",
     whatsappE164: "919599015901",
   },
-  /** Recruiter-facing availability — optional bookingUrl: your Cal.com / Calendly link shows “Book a short intro”. */
+  /**
+   * Recruiter-facing availability.
+   * Optional: add `bookingUrl` with your Cal.com or Calendly link to show “Book a short intro” in the hero.
+   */
   availability: {
     headline: "Open to senior / staff frontend & frontend-architect roles (IC)",
     subline: "India · Remote-friendly · Typical notice: per current employer agreement",
@@ -288,6 +317,64 @@ export const profile = {
       signals: ["SPFx", "SharePoint Online", "REST APIs", "Production support"],
     },
   ] satisfies ImpactHighlight[],
+  /** Quantified outcomes (from public resume / experience — same story as Experience). */
+  proofOutcomes: [
+    {
+      metric: "~30%",
+      label: "Page load improvement on targeted ecommerce initiatives after perf work (lazy loading, images, bundles).",
+      where: "Verizon · Publicis Sapient",
+    },
+    {
+      metric: "~40%",
+      label: "Responsiveness improvement on measured smart-TV / hospitality flows after rendering and animation tuning.",
+      where: "Marriott · Publicis Sapient",
+    },
+    {
+      metric: "~95%",
+      label: "Reduction in manual configuration effort for supported workflows via Node.js automation.",
+      where: "Verizon · Publicis Sapient",
+    },
+    {
+      metric: "5",
+      label: "Frontend engineers led as squad anchor across roadmap, quality, and stakeholder alignment.",
+      where: "Enterprise programs · Verizon era",
+    },
+  ] satisfies ProofOutcome[],
+  /** How this site is tuned — honest, no fake Lighthouse scores. */
+  performanceNote: {
+    intro:
+      "This portfolio is intentionally lightweight: static-friendly App Router pages, `next/font` subsetting, and motion gated by `prefers-reduced-motion` where it matters.",
+    howMeasured:
+      "I validate with Lighthouse and the Performance panel in Chrome DevTools on production builds—not a one-off marketing screenshot. Targets: stable LCP, low CLS, and no unnecessary main-thread work for first paint.",
+    bullets: [
+      "Static generation for primary routes; client islands only where interaction needs them.",
+      "Semantic landmarks, skip link, and keyboard-first patterns (⌘K palette) without blocking initial render.",
+      "JSON-LD, sitemap, and robots for discovery—same hygiene I apply to customer-facing properties.",
+    ],
+  } satisfies PerformanceNote,
+  dailyTools: [
+    {
+      name: "GitHub Copilot",
+      oneLiner:
+        "Inline suggestions for tests, refactors, and boilerplate—speeds delivery when paired with strict review and ownership.",
+    },
+    {
+      name: "Cursor",
+      oneLiner:
+        "Repo-wide reasoning and edits for migrations and debugging; I treat it as an accelerator, not a substitute for architecture judgment.",
+    },
+    {
+      name: "ChatGPT",
+      oneLiner:
+        "Drafting edge-case checklists, API exploration, and doc synthesis—then I verify in code and against production constraints.",
+    },
+  ] satisfies DailyTool[],
+  contactCta: {
+    emailSubject: "[Your role title] — Hiring: Kumar Ankur",
+    emailBody:
+      "Hi Kumar,\n\nI'm reaching out about a [ROLE] opportunity and would like to connect.\n\nBest,",
+    primaryButtonLabel: "Email about a role",
+  } satisfies ContactCta,
   writing: [
     {
       title: "Integrate custom zoom in and zoom out in React Native Maps",

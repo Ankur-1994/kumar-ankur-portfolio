@@ -89,6 +89,19 @@ export function CommandPalette() {
         },
       },
       {
+        id: "hiring-email",
+        group: "Actions",
+        label: "Email about a role (prefilled subject)",
+        keywords: ["hire", "hiring", "recruiter", "job", "role", "mailto", "opportunity"],
+        run: () => {
+          const params = new URLSearchParams();
+          params.set("subject", profile.contactCta.emailSubject);
+          params.set("body", profile.contactCta.emailBody);
+          window.location.assign(`mailto:${profile.contact.email}?${params.toString()}`);
+          close();
+        },
+      },
+      {
         id: "resume",
         group: "Actions",
         label: "Download resume (PDF)",

@@ -156,6 +156,13 @@ export function Portfolio() {
   const resumeHref = profile.assets.resumePdfPath;
   const resumeDownload = profile.assets.resumeDownloadName;
 
+  const hiringMailtoHref = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set("subject", profile.contactCta.emailSubject);
+    params.set("body", profile.contactCta.emailBody);
+    return `mailto:${profile.contact.email}?${params.toString()}`;
+  }, []);
+
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(profile.contact.email);
@@ -204,11 +211,11 @@ export function Portfolio() {
             : "border-[color:var(--border)] bg-[color:rgba(7,7,10,0.76)]"
         }`}
       >
-        <div className="mx-auto w-full max-w-7xl px-5 py-4 sm:px-8 sm:py-5">
-          <div className="flex items-center justify-between gap-6 lg:gap-10">
+        <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-8 sm:py-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 lg:gap-10">
             <Link
               href="#main-content"
-              className="focus-ring group flex min-w-0 shrink-0 items-center gap-3.5 rounded-xl outline-none sm:gap-4"
+              className="focus-ring group flex min-w-0 max-w-full items-center gap-3 rounded-xl outline-none sm:gap-4"
             >
               <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--accent-2)] text-sm font-extrabold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)] motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-[1.04]">
                 KA
@@ -216,17 +223,18 @@ export function Portfolio() {
                   <span className="absolute -inset-10 rotate-12 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.35),transparent)] blur-sm" />
                 </span>
               </span>
-              <span className="min-w-0 leading-tight">
-                <span className="block text-[0.95rem] font-semibold tracking-tight text-[color:var(--text)] sm:text-base">
+              <span className="min-w-0 flex-1 leading-tight">
+                <span className="block text-balance text-[0.95rem] font-semibold tracking-tight text-[color:var(--text)] sm:text-base">
                   Kumar Ankur
                 </span>
-                <span className="mt-0.5 block text-xs text-[color:var(--muted)] sm:text-[13px]">
-                  Frontend · Architecture · AI
+                <span className="mt-0.5 block text-[11px] leading-snug text-[color:var(--muted)] sm:text-[13px] sm:leading-tight">
+                  <span className="sm:hidden">Frontend · Arch · AI</span>
+                  <span className="hidden sm:inline">Frontend · Architecture · AI</span>
                 </span>
               </span>
             </Link>
 
-            <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 sm:flex-nowrap sm:justify-start sm:gap-2.5 md:gap-3">
               <button
                 type="button"
                 onClick={() => dispatchOpenCommandPalette()}
@@ -271,10 +279,11 @@ export function Portfolio() {
                 LinkedIn
               </a>
               <a
-                className="focus-ring inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-full bg-gradient-to-r from-[color:var(--accent)] to-[#ff8a4a] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_40px_var(--glow)] transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0"
+                className="focus-ring inline-flex min-h-[44px] touch-manipulation items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[color:var(--accent)] to-[#ff8a4a] px-3 py-2.5 text-xs font-semibold text-white shadow-[0_10px_40px_var(--glow)] transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0 sm:px-5 sm:text-sm"
                 href={profile.links.github}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="View GitHub profile"
               >
                 GitHub
               </a>
@@ -282,33 +291,19 @@ export function Portfolio() {
           </div>
 
           <nav
-            className="mt-4 hidden flex-wrap items-center justify-center gap-x-3 gap-y-2 border-t border-[color:rgba(255,255,255,0.06)] pt-4 print:flex sm:gap-x-4 md:flex"
+            className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 border-t border-[color:rgba(255,255,255,0.06)] pt-4 print:flex sm:gap-x-3 sm:gap-y-2 md:gap-x-4"
             aria-label="Primary"
           >
             {nav.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="focus-ring inline-flex min-h-[44px] items-center rounded-xl px-3.5 py-2 text-[13px] font-medium text-[color:var(--muted)] transition-[color,background-color] hover:bg-[color:rgba(255,255,255,0.05)] hover:text-[color:var(--text)] sm:px-4 sm:text-sm"
+                className="focus-ring inline-flex min-h-[44px] items-center rounded-xl border border-transparent px-3 py-2 text-[12px] font-medium text-[color:var(--muted)] transition-[color,background-color,border-color] hover:border-[color:var(--border)] hover:bg-[color:rgba(255,255,255,0.05)] hover:text-[color:var(--text)] sm:px-3.5 sm:text-[13px] md:px-4 md:text-sm"
               >
                 {item.label}
               </a>
             ))}
           </nav>
-        </div>
-
-        <div className="border-t border-[color:var(--border)] bg-[color:rgba(7,7,10,0.35)] print:hidden md:hidden">
-          <div className="mx-auto flex max-w-7xl gap-3 overflow-x-auto px-5 py-4 sm:px-8">
-            {nav.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="focus-ring inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-full border border-[color:var(--border)] bg-[color:var(--bg-soft)] px-4 py-2 text-[13px] font-semibold text-[color:var(--muted)] touch-manipulation"
-              >
-                {item.label}
-              </a>
-            ))}
-          </div>
         </div>
       </header>
 
@@ -394,9 +389,27 @@ export function Portfolio() {
                   <IconArrowUpRight className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
                 </a>
               ) : null}
+              <a
+                href={hiringMailtoHref}
+                className="focus-ring mt-3 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-[color:rgba(255,90,31,0.45)] bg-[color:rgba(255,90,31,0.12)] px-4 py-2.5 text-sm font-semibold text-[color:var(--text)] transition-colors hover:bg-[color:rgba(255,90,31,0.18)] sm:mt-4 sm:w-auto"
+              >
+                <IconMail className="h-4 w-4 shrink-0" aria-hidden />
+                {profile.contactCta.primaryButtonLabel}
+              </a>
+              <p className="mt-2 text-[11px] leading-relaxed text-[color:var(--faint)]">
+                Subject line is prefilled—replace{" "}
+                <span className="font-mono text-[color:var(--muted)]">[Your role title]</span> with the actual role.
+              </p>
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <a
+                href={hiringMailtoHref}
+                className="focus-ring inline-flex min-h-[44px] touch-manipulation items-center justify-center gap-2 rounded-2xl border border-[color:rgba(255,90,31,0.5)] bg-[color:rgba(255,90,31,0.14)] px-5 py-3 text-sm font-semibold text-[color:var(--text)] transition-colors hover:bg-[color:rgba(255,90,31,0.22)]"
+              >
+                <IconMail className="h-4 w-4 shrink-0" aria-hidden />
+                {profile.contactCta.primaryButtonLabel}
+              </a>
               <a
                 href={resumeHref}
                 download={resumeDownload}
@@ -691,6 +704,38 @@ export function Portfolio() {
           </RevealOnScroll>
         </section>
 
+        <section id="proof" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Proof at a glance</h2>
+              <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">
+                Numbers hiring managers can scan—each ties back to the programs and clients in{" "}
+                <a href="#experience" className="font-semibold text-[color:var(--accent)] underline decoration-[color:rgba(255,90,31,0.4)] underline-offset-4 hover:decoration-[color:var(--accent)]">
+                  Experience
+                </a>
+                .
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-2">
+              {profile.proofOutcomes.map((row) => (
+                <div
+                  key={row.label}
+                  className="print-avoid-break rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--bg-elevated)] p-5 sm:p-6"
+                >
+                  <p className="font-mono text-3xl font-bold tabular-nums tracking-tight text-[color:var(--accent)] sm:text-4xl">
+                    {row.metric}
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">{row.label}</p>
+                  <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--faint)]">
+                    {row.where}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </RevealOnScroll>
+        </section>
+
         <section id="skills" className="mt-16 scroll-mt-28">
           <RevealOnScroll>
           <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Skills</h2>
@@ -718,6 +763,28 @@ export function Portfolio() {
               </div>
             ))}
           </div>
+          </RevealOnScroll>
+        </section>
+
+        <section id="tools" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Tools I use daily</h2>
+              <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">
+                AI-assisted engineering is part of how I ship—always with review, security awareness, and clear ownership.
+              </p>
+            </div>
+
+            <ul className="mt-8 divide-y divide-[color:var(--border)] rounded-[1.75rem] border border-[color:var(--border)] bg-[color:var(--bg-elevated)] px-5 sm:px-8">
+              {profile.dailyTools.map((tool) => (
+                <li key={tool.name} className="flex flex-col gap-2 py-5 sm:flex-row sm:gap-10 sm:py-6">
+                  <span className="shrink-0 text-sm font-semibold tracking-tight text-[color:var(--text)] sm:w-40">
+                    {tool.name}
+                  </span>
+                  <p className="text-sm leading-relaxed text-[color:var(--muted)]">{tool.oneLiner}</p>
+                </li>
+              ))}
+            </ul>
           </RevealOnScroll>
         </section>
 
@@ -851,44 +918,6 @@ export function Portfolio() {
           </RevealOnScroll>
         </section>
 
-        <section id="craft" className="mt-16 scroll-mt-28">
-          <RevealOnScroll>
-            <div className="max-w-3xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--faint)]">Live sample</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[color:var(--text)]">This site as a product UI</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[color:var(--muted)]">
-                {profile.siteCraft.intro}
-              </p>
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[color:var(--muted)]">
-                {profile.siteCraft.paletteHint}{" "}
-                <button
-                  type="button"
-                  onClick={() => dispatchOpenCommandPalette()}
-                  className="focus-ring font-semibold text-[color:var(--accent)] underline decoration-[color:rgba(255,90,31,0.45)] underline-offset-4 hover:decoration-[color:var(--accent)]"
-                >
-                  Try it now
-                </button>
-                .
-              </p>
-              <p className="mt-3 text-xs text-[color:var(--faint)]">
-                Last content pass on this page: <span className="text-[color:var(--muted)]">{profile.siteCraft.lastUpdatedNote}</span>
-              </p>
-            </div>
-
-            <ul className="mt-10 grid list-none gap-4 p-0 sm:grid-cols-2">
-              {profile.siteCraft.signals.map((row) => (
-                <li
-                  key={row.title}
-                  className="print-avoid-break rounded-[1.35rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-5 sm:p-6"
-                >
-                  <h3 className="text-sm font-semibold tracking-tight text-[color:var(--text)]">{row.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--muted)]">{row.detail}</p>
-                </li>
-              ))}
-            </ul>
-          </RevealOnScroll>
-        </section>
-
         <section id="recommendations" className="mt-16 scroll-mt-28">
           <RevealOnScroll>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -982,6 +1011,62 @@ export function Portfolio() {
             )}
           </RevealOnScroll>
         </section>
+
+        <section id="performance" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Performance on this site</h2>
+              <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">{profile.performanceNote.intro}</p>
+              <p className="mt-4 text-sm leading-relaxed text-[color:var(--muted)]">{profile.performanceNote.howMeasured}</p>
+            </div>
+            <ul className="mt-8 max-w-3xl space-y-3 text-sm leading-relaxed text-[color:var(--muted)]">
+              {profile.performanceNote.bullets.map((b) => (
+                <li key={b} className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent)]" />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </RevealOnScroll>
+        </section>
+
+        <section id="craft" className="mt-16 scroll-mt-28">
+          <RevealOnScroll>
+            <div className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--faint)]">Live sample</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[color:var(--text)]">This site as a product UI</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[color:var(--muted)]">
+                {profile.siteCraft.intro}
+              </p>
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[color:var(--muted)]">
+                {profile.siteCraft.paletteHint}{" "}
+                <button
+                  type="button"
+                  onClick={() => dispatchOpenCommandPalette()}
+                  className="focus-ring font-semibold text-[color:var(--accent)] underline decoration-[color:rgba(255,90,31,0.45)] underline-offset-4 hover:decoration-[color:var(--accent)]"
+                >
+                  Try it now
+                </button>
+                .
+              </p>
+              <p className="mt-3 text-xs text-[color:var(--faint)]">
+                Last content pass on this page: <span className="text-[color:var(--muted)]">{profile.siteCraft.lastUpdatedNote}</span>
+              </p>
+            </div>
+
+            <ul className="mt-10 grid list-none gap-4 p-0 sm:grid-cols-2">
+              {profile.siteCraft.signals.map((row) => (
+                <li
+                  key={row.title}
+                  className="print-avoid-break rounded-[1.35rem] border border-[color:var(--border)] bg-[color:rgba(255,255,255,0.03)] p-5 sm:p-6"
+                >
+                  <h3 className="text-sm font-semibold tracking-tight text-[color:var(--text)]">{row.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--muted)]">{row.detail}</p>
+                </li>
+              ))}
+            </ul>
+          </RevealOnScroll>
+        </section>
       </main>
 
       <footer
@@ -1002,9 +1087,9 @@ export function Portfolio() {
             >
               <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--text)]">Contact</h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-[color:var(--muted)]">
-                LinkedIn for a professional note, email for a thread or attachments, WhatsApp when scheduling is
-                simpler. Export this page with a print-friendly layout using{" "}
-                <span className="font-semibold text-[color:var(--text)]">Print / Save as PDF</span> below, or{" "}
+                LinkedIn for a professional note, WhatsApp when scheduling is simpler, or use the hiring mailto below—
+                subject and a short body are prefilled so you can drop in the role title. Export this page with{" "}
+                <span className="font-semibold text-[color:var(--text)]">Print / Save as PDF</span> or{" "}
                 <span className="font-semibold text-[color:var(--text)]">Search (⌘K / Ctrl+K)</span> → “Print page”.
               </p>
             </motion.div>
@@ -1020,6 +1105,13 @@ export function Portfolio() {
                   : { type: "spring" as const, stiffness: 95, damping: 24, mass: 0.9, delay: 0.08 }
               }
             >
+              <a
+                href={hiringMailtoHref}
+                className="focus-ring inline-flex min-h-[44px] touch-manipulation items-center justify-center gap-2 rounded-2xl border border-[color:rgba(255,90,31,0.5)] bg-[color:rgba(255,90,31,0.14)] px-4 py-3 text-sm font-semibold text-[color:var(--text)] transition-colors hover:bg-[color:rgba(255,90,31,0.22)] sm:col-span-2"
+              >
+                <IconMail className="h-4 w-4 shrink-0" aria-hidden />
+                {profile.contactCta.primaryButtonLabel}
+              </a>
               <a
                 href={resumeHref}
                 download={resumeDownload}
