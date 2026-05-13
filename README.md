@@ -1,54 +1,81 @@
 # Kumar Ankur — Portfolio
 
-Single-page portfolio built with **Next.js (App Router)**, **TypeScript**, and **Tailwind CSS v4**.
+Personal single-page portfolio for a senior frontend engineer: dark UI, strong typography, and content driven from typed data files rather than scattered JSX.
 
-## Local development
+**Stack:** [Next.js](https://nextjs.org/) 16 (App Router) · React 19 · TypeScript · [Tailwind CSS](https://tailwindcss.com/) v4 · [Framer Motion](https://www.framer.com/motion/)
+
+---
+
+## Features
+
+- **Sections:** About, Experience (timeline with employer logos), Impact, Skills, Writing, Featured project, Recommendations, “This site” craft notes, Contact.
+- **Command palette:** `⌘K` / `Ctrl+K` for in-page navigation and quick actions (see `src/components/command-palette.tsx`).
+- **Toasts:** Feedback for clipboard and resume actions (`src/components/toast.tsx`).
+- **Motion & polish:** Optional splash screen, scroll-linked parallax, section reveals, reading progress bar at the top of the viewport.
+- **Accessibility:** Skip link, visible focus styles, `prefers-reduced-motion` respected for motion-heavy UI.
+- **SEO & sharing:** Metadata from `layout.tsx`, Person JSON-LD, Open Graph image route, `sitemap.xml`, `robots.txt`, web app manifest.
+
+---
+
+## Getting started
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Content updates
+| Script        | Purpose                |
+| ------------- | ---------------------- |
+| `npm run dev` | Development server     |
+| `npm run build` | Production build       |
+| `npm run start` | Serve production build |
+| `npm run lint`  | ESLint                 |
 
-Most copy lives in:
+---
 
-- `src/data/profile.ts`
+## Customizing content
 
-UI composition lives in:
+| What | Where |
+| ---- | ----- |
+| Bio, experience, skills, links, availability, impact blocks, site craft copy | `src/data/profile.ts` |
+| In-page nav + command palette section order | `src/data/site-nav.ts` |
+| Live “years of experience” / `{{years}}` substitution | `profile.careerStartISO` + `src/lib/career-years.ts` |
+| Resume PDF (download button) | `public/` — paths in `profile.assets` |
+| Company marks in Experience | `public/logos/*.svg` — `logoSrc` on each `ExperienceItem` (optional `logoWide` behavior is keyed off `company === "MakeMyTrip"` in `portfolio.tsx`) |
 
-- `src/components/portfolio.tsx`
+Main layout and section composition: `src/components/portfolio.tsx`. App shell (palette, splash, toasts): `src/components/client-home.tsx`.
 
-## Production metadata (recommended)
+---
 
-Set `NEXT_PUBLIC_SITE_URL` to your deployed origin (no trailing slash), for example:
+## Environment variables
 
-- `https://kumar-ankur-portfolio.vercel.app`
+Copy `.env.example` to `.env.local` for local use.
 
-See `.env.example`.
+| Variable | Purpose |
+| -------- | ------- |
+| `NEXT_PUBLIC_SITE_URL` | Canonical site origin **without** a trailing slash (e.g. `https://your-domain.com`). Used for `metadataBase`, Open Graph, and absolute URLs in metadata. Defaults to `http://localhost:3000` when unset. |
 
-## Deploy (free + fast)
+---
 
-The simplest path is **Vercel**:
+## Deployment
 
-1. Push this repo to GitHub (`Ankur-1994/kumar-ankur-portfolio`).
-2. Import the repo in Vercel.
-3. Add environment variable `NEXT_PUBLIC_SITE_URL` with your production URL.
+A typical production setup is **Vercel**:
 
-## Connect this codebase to your GitHub repo
+1. Push the repository to GitHub.
+2. Import the project in Vercel.
+3. Set `NEXT_PUBLIC_SITE_URL` to your production URL in the project environment variables.
+4. Deploy (build command: `npm run build`, output: Next.js default).
 
-If you generated the project locally (not via `git clone`), run:
+---
 
-```bash
-cd /path/to/kumar-ankur-portfolio
-git init
-git add .
-git commit -m "Initial portfolio site"
-git branch -M main
-git remote add origin https://github.com/Ankur-1994/kumar-ankur-portfolio.git
-git push -u origin main
-```
+## Agent / Next.js note
 
-If GitHub shows a non-empty default branch already, follow GitHub’s instructions to reconcile histories (or force-push only if you intend to replace remote history).
+This repo pins a recent Next.js major. If you use AI or older docs, prefer the in-repo guides under `node_modules/next/dist/docs/` and the official Next.js site for your installed version.
+
+---
+
+## License
+
+Private project (`"private": true` in `package.json`). All rights reserved unless you choose to add an explicit license.
